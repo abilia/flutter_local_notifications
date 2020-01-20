@@ -55,13 +55,16 @@ class MethodChannelFlutterLocalNotificationsPlugin
 class AndroidFlutterLocalNotificationsPlugin
     extends MethodChannelFlutterLocalNotificationsPlugin {
   SelectNotificationCallback _onSelectNotification;
+  StreamController<String> _selectNotificationStreamController;
 
   /// Initializes the plugin. Call this method on application before using the plugin further.
   /// This should only be done once. When a notification created by this plugin was used to launch the app,
   /// calling `initialize` is what will trigger to the `onSelectNotification` callback to be fire.
   Future<bool> initialize(AndroidInitializationSettings initializationSettings,
+      StreamController<String> selectNotificationStreamController,
       {SelectNotificationCallback onSelectNotification}) async {
     _onSelectNotification = onSelectNotification;
+    _selectNotificationStreamController = selectNotificationStreamController;
     _channel.setMethodCallHandler(_handleMethod);
     return await _channel.invokeMethod(
         'initialize', initializationSettings.toMap());
@@ -163,6 +166,7 @@ class AndroidFlutterLocalNotificationsPlugin
   Future<void> _handleMethod(MethodCall call) {
     switch (call.method) {
       case 'selectNotification':
+        _selectNotificationStreamController.add(call.arguments);
         return _onSelectNotification(call.arguments);
       default:
         return Future.error('method not defined');
@@ -176,13 +180,16 @@ class IOSFlutterLocalNotificationsPlugin
   SelectNotificationCallback _onSelectNotification;
 
   DidReceiveLocalNotificationCallback _onDidReceiveLocalNotification;
+  StreamController<String> _selectNotificationStreamController;
 
   /// Initializes the plugin. Call this method on application before using the plugin further.
   /// This should only be done once. When a notification created by this plugin was used to launch the app,
   /// calling `initialize` is what will trigger to the `onSelectNotification` callback to be fire.
   Future<bool> initialize(IOSInitializationSettings initializationSettings,
+      StreamController<String> selectNotificationStreamController,
       {SelectNotificationCallback onSelectNotification}) async {
     _onSelectNotification = onSelectNotification;
+    _selectNotificationStreamController = selectNotificationStreamController;
     _onDidReceiveLocalNotification =
         initializationSettings.onDidReceiveLocalNotification;
     _channel.setMethodCallHandler(_handleMethod);
@@ -281,6 +288,7 @@ class IOSFlutterLocalNotificationsPlugin
   Future<void> _handleMethod(MethodCall call) {
     switch (call.method) {
       case 'selectNotification':
+        _selectNotificationStreamController.add(call.arguments);
         return _onSelectNotification(call.arguments);
 
       case 'didReceiveLocalNotification':

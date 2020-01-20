@@ -29,6 +29,8 @@ class FlutterLocalNotificationsPlugin {
       FlutterLocalNotificationsPlugin.private(const LocalPlatform());
 
   final Platform _platform;
+  final _selectNotificationStreamController = StreamController<String>();
+  Stream<String> _onSelectNotificationStream;
 
   /// Initializes the plugin. Call this method on application before using the plugin further.
   /// This should only be done once. When a notification created by this plugin was used to launch the app,
@@ -39,11 +41,13 @@ class FlutterLocalNotificationsPlugin {
       return await (FlutterLocalNotificationsPlatform.instance
               as AndroidFlutterLocalNotificationsPlugin)
           ?.initialize(initializationSettings?.android,
+              _selectNotificationStreamController,
               onSelectNotification: onSelectNotification);
     } else if (_platform.isIOS) {
       return await (FlutterLocalNotificationsPlatform.instance
               as IOSFlutterLocalNotificationsPlugin)
-          ?.initialize(initializationSettings?.ios,
+          ?.initialize(
+              initializationSettings?.ios, _selectNotificationStreamController,
               onSelectNotification: onSelectNotification);
     } else {
       throw UnimplementedError('initialize() has not been implemented');
@@ -188,5 +192,10 @@ class FlutterLocalNotificationsPlugin {
   Future<List<PendingNotificationRequest>> pendingNotificationRequests() {
     return FlutterLocalNotificationsPlatform.instance
         .pendingNotificationRequests();
+  }
+
+  Stream<String> getSelectNotificationStream() {
+    return _onSelectNotificationStream ??=
+        _selectNotificationStreamController.stream.asBroadcastStream();
   }
 }
