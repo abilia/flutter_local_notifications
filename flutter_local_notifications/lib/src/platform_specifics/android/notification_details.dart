@@ -45,6 +45,7 @@ class AndroidNotificationDetails {
     this.timeoutAfter,
     this.category,
     this.fullScreenIntent = false,
+    this.wakeScreenForMs = 0,
     this.additionalFlags,
   });
 
@@ -224,6 +225,10 @@ class AndroidNotificationDetails {
   /// instead of launching your full-screen intent, while the user is using the
   /// device.
   final bool fullScreenIntent;
+
+  /// The duration in milliseconds after which wake lock should be acquired.
+  /// No wake lock with values <=0.
+  final int wakeScreenForMs;
 
   /// Specifies the additional flags.
   ///

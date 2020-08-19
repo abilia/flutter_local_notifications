@@ -109,6 +109,7 @@ public class NotificationDetails {
     private static final String TIME_ZONE_NAME = "timeZoneName";
     private static final String SCHEDULED_NOTIFICATION_REPEAT_FREQUENCY = "scheduledNotificationRepeatFrequency";
     private static final String FULL_SCREEN_INTENT = "fullScreenIntent";
+    private static final String WAKE_SCREEN_FOR_MS = "wakeScreenForMs";
 
     public Integer id;
     public String title;
@@ -163,6 +164,7 @@ public class NotificationDetails {
     public ScheduledNotificationRepeatFrequency scheduledNotificationRepeatFrequency;
     public Long when;
     public Boolean fullScreenIntent;
+    public Long wakeScreenForMs;
 
 
 
@@ -230,6 +232,7 @@ public class NotificationDetails {
             notificationDetails.timeoutAfter = parseLong(platformChannelSpecifics.get(TIMEOUT_AFTER));
             notificationDetails.category = (String) platformChannelSpecifics.get(CATEGORY);
             notificationDetails.fullScreenIntent = (Boolean) platformChannelSpecifics.get((FULL_SCREEN_INTENT));
+            notificationDetails.wakeScreenForMs = parseLong(platformChannelSpecifics.get(WAKE_SCREEN_FOR_MS));
             notificationDetails.additionalFlags = (int[]) platformChannelSpecifics.get(ADDITIONAL_FLAGS);
         }
     }
