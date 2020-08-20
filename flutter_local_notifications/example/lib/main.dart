@@ -450,6 +450,12 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                     PaddedRaisedButton(
+                      buttonText: 'Show notification that wakes the screen',
+                      onPressed: () async {
+                        await _scheduleWakeUpNotification();
+                      },
+                    ),
+                    PaddedRaisedButton(
                       buttonText: 'Create notification channel',
                       onPressed: () async {
                         await _createNotificationChannel();
@@ -551,6 +557,49 @@ class _HomePageState extends State<HomePage> {
             )
           ],
         ));
+  }
+
+  Future<void> _scheduleWakeUpNotification() async {
+    await showDialog(
+      context: context,
+      child: AlertDialog(
+        title: Text('Turn off your screen'),
+        content: Text(
+            'to see the wake screen in 5 seconds, press OK and TURN OFF your screen'),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Cancel'),
+            onPressed: Navigator.of(context).pop,
+          ),
+          FlatButton(
+            child: Text('OK'),
+            onPressed: () async {
+              await flutterLocalNotificationsPlugin.zonedSchedule(
+                0,
+                'scheduled title',
+                'scheduled body',
+                tz.TZDateTime.now(tz.local).add(Duration(seconds: 5)),
+                NotificationDetails(
+                  android: AndroidNotificationDetails(
+                    'full screen channel id',
+                    'full screen channel name',
+                    'full screen channel description',
+                    priority: Priority.high,
+                    importance: Importance.high,
+                    wakeScreenForMs: 2000,
+                  ),
+                ),
+                androidAllowWhileIdle: true,
+                uiLocalNotificationDateInterpretation:
+                    UILocalNotificationDateInterpretation.absoluteTime,
+              );
+
+              Navigator.of(context).pop();
+            },
+          )
+        ],
+      ),
+    );
   }
 
   Future<void> _showNotificationWithNoBody() async {
