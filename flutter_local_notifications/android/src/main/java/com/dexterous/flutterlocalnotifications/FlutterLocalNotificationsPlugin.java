@@ -801,6 +801,16 @@ public class FlutterLocalNotificationsPlugin implements MethodCallHandler, Plugi
         }
     }
 
+    static void startAlarmActivity(final Context context, NotificationDetails notificationDetails) {
+        Intent intent = new Intent(context, getMainActivityClass(context));
+        intent.setAction(SELECT_NOTIFICATION);
+        intent.putExtra(PAYLOAD, notificationDetails.payload);
+        intent.addFlags(Intent.FLAG_FROM_BACKGROUND);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
 
     private static NotificationManagerCompat getNotificationManager(Context context) {
         return NotificationManagerCompat.from(context);

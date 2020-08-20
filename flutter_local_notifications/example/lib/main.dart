@@ -456,6 +456,12 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                     PaddedRaisedButton(
+                      buttonText: 'Force start activity on top',
+                      onPressed: () async {
+                        await _schedulStartActivity();
+                      },
+                    ),
+                    PaddedRaisedButton(
                       buttonText: 'Create notification channel',
                       onPressed: () async {
                         await _createNotificationChannel();
@@ -587,6 +593,50 @@ class _HomePageState extends State<HomePage> {
                     priority: Priority.high,
                     importance: Importance.high,
                     wakeScreenForMs: 2000,
+                  ),
+                ),
+                androidAllowWhileIdle: true,
+                uiLocalNotificationDateInterpretation:
+                    UILocalNotificationDateInterpretation.absoluteTime,
+              );
+
+              Navigator.of(context).pop();
+            },
+          )
+        ],
+      ),
+    );
+  }
+
+  Future<void> _schedulStartActivity() async {
+    await showDialog(
+      context: context,
+      child: AlertDialog(
+        title: Text('Starts the activity on top'),
+        content:
+            Text('press OK and the activity will start on top after 5 seconds'),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Cancel'),
+            onPressed: Navigator.of(context).pop,
+          ),
+          FlatButton(
+            child: Text('OK'),
+            onPressed: () async {
+              await flutterLocalNotificationsPlugin.zonedSchedule(
+                0,
+                'scheduled title',
+                'scheduled body',
+                tz.TZDateTime.now(tz.local).add(Duration(seconds: 66)),
+                NotificationDetails(
+                  android: AndroidNotificationDetails(
+                    'full screen channel id',
+                    'full screen channel name',
+                    'full screen channel description',
+                    priority: Priority.high,
+                    importance: Importance.high,
+                    wakeScreenForMs: 2000,
+                    fullScreenIntent: true,
                   ),
                 ),
                 androidAllowWhileIdle: true,
