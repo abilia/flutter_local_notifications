@@ -51,6 +51,9 @@ public class ScheduledNotificationReceiver extends BroadcastReceiver {
             }
             if (notificationDetails.wakeScreenForMs > 0) {
                 FlutterLocalNotificationsPlugin.wakeScreen(context, notificationDetails.wakeScreenForMs);
+                if (notificationDetails.fullScreenIntent) {
+                    FlutterLocalNotificationsPlugin.startAlarmActivity(context, notificationDetails);
+                }
             }
         }
 
