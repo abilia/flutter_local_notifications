@@ -15,8 +15,10 @@ import android.graphics.BitmapFactory;
 import android.media.AudioAttributes;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
+import android.os.PowerManager;
 import android.service.notification.StatusBarNotification;
 import android.text.Html;
 import android.text.Spanned;
@@ -786,6 +788,17 @@ public class FlutterLocalNotificationsPlugin implements MethodCallHandler, Plugi
             }
         }
         return null;
+    }
+
+    static void wakeScreen(final Context context, final Long wakeScreenForMs) {
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        boolean screenOn = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH ? pm.isInteractive()
+                : pm.isScreenOn();
+        if (!screenOn) {
+            PowerManager.WakeLock wl = pm.newWakeLock(
+                    PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "com.dexterous.flutterlocalnotifications:WAKE_LOCK");
+            wl.acquire(wakeScreenForMs);
+        }
     }
 
 
