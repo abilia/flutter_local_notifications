@@ -236,6 +236,7 @@ extension AndroidNotificationDetailsMapper on AndroidNotificationDetails {
         'category': category,
         'fullScreenIntent': fullScreenIntent,
         'wakeScreenForMs': wakeScreenForMs,
+        'startActivityClassName': startActivityClassName,
         'additionalFlags': additionalFlags,
       }
         ..addAll(_convertStyleInformationToMap())
