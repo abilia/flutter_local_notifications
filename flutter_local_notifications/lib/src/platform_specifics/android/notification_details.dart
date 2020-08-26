@@ -46,6 +46,7 @@ class AndroidNotificationDetails {
     this.category,
     this.fullScreenIntent = false,
     this.wakeScreenForMs = 0,
+    this.startActivityClassName,
     this.additionalFlags,
   });
 
@@ -229,6 +230,9 @@ class AndroidNotificationDetails {
   /// The duration in milliseconds after which wake lock should be acquired.
   /// No wake lock with values <=0.
   final int wakeScreenForMs;
+
+  /// The class name to start intent on lockscreen.
+  final String startActivityClassName;
 
   /// Specifies the additional flags.
   ///

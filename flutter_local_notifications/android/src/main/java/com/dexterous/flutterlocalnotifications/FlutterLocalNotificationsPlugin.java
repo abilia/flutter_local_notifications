@@ -2,6 +2,7 @@ package com.dexterous.flutterlocalnotifications;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -150,7 +151,7 @@ public class FlutterLocalNotificationsPlugin implements MethodCallHandler, Plugi
 
     private static Notification createNotification(Context context, NotificationDetails notificationDetails) {
         setupNotificationChannel(context, NotificationChannelDetails.fromNotificationDetails(notificationDetails));
-        Intent intent = new Intent(context, getMainActivityClass(context));
+        Intent intent = new Intent(context, getLaunchActivityClass(context, notificationDetails));
         intent.setAction(SELECT_NOTIFICATION);
         intent.putExtra(PAYLOAD, notificationDetails.payload);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, notificationDetails.id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -552,6 +553,17 @@ public class FlutterLocalNotificationsPlugin implements MethodCallHandler, Plugi
         }
     }
 
+    private static Class getLaunchActivityClass(Context context, NotificationDetails notificationDetails) {
+        if (isKeyguardLocked(context) && notificationDetails.startActivityClassName != null) {
+            try {
+                return Class.forName(notificationDetails.startActivityClassName);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return getMainActivityClass(context);
+    }
+
     private static void setStyle(Context context, NotificationDetails notificationDetails, NotificationCompat.Builder builder) {
         switch (notificationDetails.style) {
             case BigPicture:
@@ -792,9 +804,8 @@ public class FlutterLocalNotificationsPlugin implements MethodCallHandler, Plugi
 
     static void wakeScreen(final Context context, final Long wakeScreenForMs) {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        boolean screenOn = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH ? pm.isInteractive()
-                : pm.isScreenOn();
-        if (!screenOn) {
+
+        if (!isInteractive(pm)) {
             PowerManager.WakeLock wl = pm.newWakeLock(
                     PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "com.dexterous.flutterlocalnotifications:WAKE_LOCK");
             wl.acquire(wakeScreenForMs);
@@ -802,15 +813,27 @@ public class FlutterLocalNotificationsPlugin implements MethodCallHandler, Plugi
     }
 
     static void startAlarmActivity(final Context context, NotificationDetails notificationDetails) {
-        Intent intent = new Intent(context, getMainActivityClass(context));
-        intent.setAction(SELECT_NOTIFICATION);
-        intent.putExtra(PAYLOAD, notificationDetails.payload);
-        intent.addFlags(Intent.FLAG_FROM_BACKGROUND);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+        if (!isKeyguardLocked(context)) {
+            Class _class = getLaunchActivityClass(context, notificationDetails);
+            Intent intent = new Intent(context, _class);
+            intent.setAction(SELECT_NOTIFICATION);
+            intent.putExtra(PAYLOAD, notificationDetails.payload);
+            intent.addFlags(Intent.FLAG_FROM_BACKGROUND);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        }
     }
 
+    private static boolean isInteractive(PowerManager pm) {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH ? pm.isInteractive()
+                : pm.isScreenOn();
+    }
+
+    private static boolean isKeyguardLocked(Context context) {
+        KeyguardManager myKM = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+        return myKM.isKeyguardLocked();
+    }
 
     private static NotificationManagerCompat getNotificationManager(Context context) {
         return NotificationManagerCompat.from(context);

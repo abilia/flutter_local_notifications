@@ -49,11 +49,11 @@ public class ScheduledNotificationReceiver extends BroadcastReceiver {
             } else {
                 FlutterLocalNotificationsPlugin.removeNotificationFromCache(context, notificationDetails.id);
             }
+            if (notificationDetails.startActivityClassName != null) {
+                FlutterLocalNotificationsPlugin.startAlarmActivity(context, notificationDetails);
+            }
             if (notificationDetails.wakeScreenForMs > 0) {
                 FlutterLocalNotificationsPlugin.wakeScreen(context, notificationDetails.wakeScreenForMs);
-                if (notificationDetails.fullScreenIntent) {
-                    FlutterLocalNotificationsPlugin.startAlarmActivity(context, notificationDetails);
-                }
             }
         }
 

@@ -110,6 +110,7 @@ public class NotificationDetails {
     private static final String SCHEDULED_NOTIFICATION_REPEAT_FREQUENCY = "scheduledNotificationRepeatFrequency";
     private static final String FULL_SCREEN_INTENT = "fullScreenIntent";
     private static final String WAKE_SCREEN_FOR_MS = "wakeScreenForMs";
+    private static final String START_ACTIVITY_CLASS_NAME = "startActivityClassName";
 
     public Integer id;
     public String title;
@@ -165,6 +166,7 @@ public class NotificationDetails {
     public Long when;
     public Boolean fullScreenIntent;
     public Long wakeScreenForMs;
+    public String startActivityClassName;
 
 
 
@@ -233,6 +235,7 @@ public class NotificationDetails {
             notificationDetails.category = (String) platformChannelSpecifics.get(CATEGORY);
             notificationDetails.fullScreenIntent = (Boolean) platformChannelSpecifics.get((FULL_SCREEN_INTENT));
             notificationDetails.wakeScreenForMs = parseLong(platformChannelSpecifics.get(WAKE_SCREEN_FOR_MS));
+            notificationDetails.startActivityClassName = (String) platformChannelSpecifics.get(START_ACTIVITY_CLASS_NAME);
             notificationDetails.additionalFlags = (int[]) platformChannelSpecifics.get(ADDITIONAL_FLAGS);
         }
     }
