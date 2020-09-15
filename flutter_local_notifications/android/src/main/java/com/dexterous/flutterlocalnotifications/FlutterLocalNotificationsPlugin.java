@@ -813,16 +813,12 @@ public class FlutterLocalNotificationsPlugin implements MethodCallHandler, Plugi
     }
 
     static void startAlarmActivity(final Context context, NotificationDetails notificationDetails) {
-        if (!isKeyguardLocked(context)) {
-            Class _class = getLaunchActivityClass(context, notificationDetails);
-            Intent intent = new Intent(context, _class);
-            intent.setAction(SELECT_NOTIFICATION);
-            intent.putExtra(PAYLOAD, notificationDetails.payload);
-            intent.addFlags(Intent.FLAG_FROM_BACKGROUND);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
-        }
+        Intent intent = new Intent(context, getLaunchActivityClass(context, notificationDetails));
+        intent.setAction(SELECT_NOTIFICATION);
+        intent.putExtra(PAYLOAD, notificationDetails.payload);
+        intent.addFlags(Intent.FLAG_FROM_BACKGROUND);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 
     private static boolean isInteractive(PowerManager pm) {
