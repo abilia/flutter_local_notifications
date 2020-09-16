@@ -826,7 +826,7 @@ public class FlutterLocalNotificationsPlugin implements MethodCallHandler, Plugi
                 : pm.isScreenOn();
     }
 
-    private static boolean isKeyguardLocked(Context context) {
+    static boolean isKeyguardLocked(Context context) {
         KeyguardManager myKM = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
         return myKM.isKeyguardLocked();
     }
