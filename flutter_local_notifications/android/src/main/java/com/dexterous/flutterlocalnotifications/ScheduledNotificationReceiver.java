@@ -58,15 +58,16 @@ public class ScheduledNotificationReceiver extends BroadcastReceiver {
       Gson gson = FlutterLocalNotificationsPlugin.buildGson();
       Type type = new TypeToken<NotificationDetails>() {}.getType();
       NotificationDetails notificationDetails = gson.fromJson(notificationDetailsJson, type);
-
-      if (notificationDetails.showNotification == null || notificationDetails.showNotification) {
+      final boolean locked = FlutterLocalNotificationsPlugin.isKeyguardLocked(context);
+      if (notificationDetails.showNotification == null
+          || notificationDetails.showNotification
+          || locked) {
         FlutterLocalNotificationsPlugin.showNotification(context, notificationDetails);
       } else {
         BackgroundAlarm.start(context, notificationDetails);
       }
       FlutterLocalNotificationsPlugin.scheduleNextNotification(context, notificationDetails);
 
-      boolean locked = FlutterLocalNotificationsPlugin.isKeyguardLocked(context);
       boolean firstAlarm =
           LocalDateTime.parse(notificationDetails.scheduledDateTime).getSecond() == 0;
       boolean hasStartActivity = notificationDetails.startActivityClassName != null;
