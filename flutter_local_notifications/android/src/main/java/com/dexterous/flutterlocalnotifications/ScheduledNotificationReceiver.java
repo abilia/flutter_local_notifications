@@ -59,7 +59,9 @@ public class ScheduledNotificationReceiver extends BroadcastReceiver {
       Type type = new TypeToken<NotificationDetails>() {}.getType();
       NotificationDetails notificationDetails = gson.fromJson(notificationDetailsJson, type);
       final boolean locked = FlutterLocalNotificationsPlugin.isKeyguardLocked(context);
-      if (notificationDetails.showNotification == null || notificationDetails.showNotification || locked) {
+      if (notificationDetails.showNotification == null
+          || notificationDetails.showNotification
+          || locked) {
         FlutterLocalNotificationsPlugin.showNotification(context, notificationDetails);
       } else {
         BackgroundAlarm.start(context, notificationDetails);
