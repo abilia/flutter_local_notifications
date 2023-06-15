@@ -21,18 +21,18 @@ import java.time.LocalDateTime;
 @Keep
 public class ScheduledNotificationReceiver extends BroadcastReceiver {
 
-  private static final String TAG = ScheduledNotificationReceiver.class.getName();
+  private static final String TAG = "ScheduledNotificationReceiver";
 
   @Override
   @SuppressWarnings("deprecation")
   public void onReceive(final Context context, Intent intent) {
-    final String notificationDetailsJson =
+    String notificationDetailsJson =
         intent.getStringExtra(FlutterLocalNotificationsPlugin.NOTIFICATION_DETAILS);
     if (StringUtils.isNullOrEmpty(notificationDetailsJson)) {
       // This logic is needed for apps that used the plugin prior to 0.3.4
 
       Notification notification;
-      final int notificationId = intent.getIntExtra("notification_id", 0);
+      int notificationId = intent.getIntExtra("notification_id", 0);
 
       if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
         notification = intent.getParcelableExtra("notification", Notification.class);
@@ -50,26 +50,25 @@ public class ScheduledNotificationReceiver extends BroadcastReceiver {
       notification.when = System.currentTimeMillis();
       NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
       notificationManager.notify(notificationId, notification);
-      if (!intent.getBooleanExtra("repeat", false)) {
+      boolean repeat = intent.getBooleanExtra("repeat", false);
+      if (!repeat) {
         FlutterLocalNotificationsPlugin.removeNotificationFromCache(context, notificationId);
       }
     } else {
-      final Gson gson = FlutterLocalNotificationsPlugin.buildGson();
-      final Type type = new TypeToken<NotificationDetails>() {}.getType();
+      Gson gson = FlutterLocalNotificationsPlugin.buildGson();
+      Type type = new TypeToken<NotificationDetails>() {}.getType();
       NotificationDetails notificationDetails = gson.fromJson(notificationDetailsJson, type);
       final boolean locked = FlutterLocalNotificationsPlugin.isKeyguardLocked(context);
-      if (notificationDetails.showNotification == null
-          || notificationDetails.showNotification
-          || locked) {
+      if (notificationDetails.showNotification == null || notificationDetails.showNotification || locked) {
         FlutterLocalNotificationsPlugin.showNotification(context, notificationDetails);
       } else {
         BackgroundAlarm.start(context, notificationDetails);
       }
       FlutterLocalNotificationsPlugin.scheduleNextNotification(context, notificationDetails);
 
-      final boolean firstAlarm =
+      boolean firstAlarm =
           LocalDateTime.parse(notificationDetails.scheduledDateTime).getSecond() == 0;
-      final boolean hasStartActivity = notificationDetails.startActivityClassName != null;
+      boolean hasStartActivity = notificationDetails.startActivityClassName != null;
       if (hasStartActivity && (!locked || !firstAlarm)) {
         FlutterLocalNotificationsPlugin.startAlarmActivity(context, notificationDetails);
       }
