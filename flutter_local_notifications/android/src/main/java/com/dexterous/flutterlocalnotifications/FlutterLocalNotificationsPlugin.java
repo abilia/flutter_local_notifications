@@ -1722,7 +1722,6 @@ public class FlutterLocalNotificationsPlugin
       notificationManager.cancel(tag, id);
     }
     removeNotificationFromCache(applicationContext, id);
-    BackgroundAlarm.stop();
   }
 
   private void cancelAllNotifications(Result result) {
