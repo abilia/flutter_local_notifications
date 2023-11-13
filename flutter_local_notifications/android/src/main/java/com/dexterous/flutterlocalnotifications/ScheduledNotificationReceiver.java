@@ -63,8 +63,6 @@ public class ScheduledNotificationReceiver extends BroadcastReceiver {
           || notificationDetails.showNotification
           || locked) {
         FlutterLocalNotificationsPlugin.showNotification(context, notificationDetails);
-      } else {
-        BackgroundAlarm.start(context, notificationDetails);
       }
       FlutterLocalNotificationsPlugin.scheduleNextNotification(context, notificationDetails);
 
