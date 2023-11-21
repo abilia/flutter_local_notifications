@@ -25,8 +25,8 @@ void main() {
     setUp(() {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
       flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-      // ignore: always_specify_types
-      channel.setMockMethodCallHandler((methodCall) async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
         log.add(methodCall);
         if (methodCall.method == 'initialize') {
           return true;
@@ -37,6 +37,7 @@ void main() {
         } else if (methodCall.method == 'getNotificationAppLaunchDetails') {
           return null;
         }
+        return null;
       });
     });
 
@@ -2551,6 +2552,24 @@ void main() {
               'foregroundServiceTypes': null
             },
           ));
+    });
+
+    test('requestNotificationsPermission', () async {
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()!
+          .requestNotificationsPermission();
+      expect(log.last,
+          isMethodCall('requestNotificationsPermission', arguments: null));
+    });
+
+    test('requestExactAlarmsPermission', () async {
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()!
+          .requestExactAlarmsPermission();
+      expect(log.last,
+          isMethodCall('requestExactAlarmsPermission', arguments: null));
     });
   });
 }

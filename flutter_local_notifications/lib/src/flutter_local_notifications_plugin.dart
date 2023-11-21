@@ -293,44 +293,6 @@ class FlutterLocalNotificationsPlugin {
     await FlutterLocalNotificationsPlatform.instance.cancelAll();
   }
 
-  /// Schedules a notification to be shown at the specified date and time.
-  ///
-  /// The [androidAllowWhileIdle] parameter determines if the notification
-  /// should still be shown at the exact time even when the device is in a
-  /// low-power idle mode.
-  @Deprecated('Deprecated due to problems with time zones. Use zonedSchedule '
-      'instead.')
-  Future<void> schedule(
-    int id,
-    String? title,
-    String? body,
-    DateTime scheduledDate,
-    NotificationDetails notificationDetails, {
-    String? payload,
-    @Deprecated('Deprecated in favor of the androidScheduleMode parameter')
-        bool androidAllowWhileIdle = false,
-    AndroidScheduleMode? androidScheduleMode,
-  }) async {
-    if (kIsWeb) {
-      return;
-    }
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      await resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()!
-          .schedule(id, title, body, scheduledDate, notificationDetails.android,
-              payload: payload,
-              scheduleMode: _chooseScheduleMode(
-                  androidScheduleMode, androidAllowWhileIdle));
-    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-      await resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>()
-          ?.schedule(id, title, body, scheduledDate, notificationDetails.iOS,
-              payload: payload);
-    } else if (defaultTargetPlatform == TargetPlatform.macOS) {
-      throw UnimplementedError();
-    }
-  }
-
   /// Schedules a notification to be shown at the specified date and time
   /// relative to a specific time zone.
   ///
@@ -365,6 +327,10 @@ class FlutterLocalNotificationsPlugin {
   /// 10:00 and the value of the [matchDateTimeComponents] is
   /// [DateTimeComponents.time], then the next time a notification will
   /// appear is 2020-10-20 10:00.
+  ///
+  /// On Android, this will also require additional setup for the app,
+  /// especially in the app's `AndroidManifest.xml` file. Please see check the
+  /// readme for further details.
   Future<void> zonedSchedule(
     int id,
     String? title,
@@ -374,7 +340,7 @@ class FlutterLocalNotificationsPlugin {
     required UILocalNotificationDateInterpretation
         uiLocalNotificationDateInterpretation,
     @Deprecated('Deprecated in favor of the androidScheduleMode parameter')
-        bool androidAllowWhileIdle = false,
+    bool androidAllowWhileIdle = false,
     AndroidScheduleMode? androidScheduleMode,
     String? payload,
     DateTimeComponents? matchDateTimeComponents,
@@ -411,6 +377,8 @@ class FlutterLocalNotificationsPlugin {
               id, title, body, scheduledDate, notificationDetails.macOS,
               payload: payload,
               matchDateTimeComponents: matchDateTimeComponents);
+    } else {
+      throw UnimplementedError('zonedSchedule() has not been implemented');
     }
   }
 
@@ -431,6 +399,10 @@ class FlutterLocalNotificationsPlugin {
   /// future majorrelease in favour of the [androidScheduledMode] parameter that
   /// provides the same functionality in addition to being able to schedule
   /// notifications with inexact timings.
+  ///
+  /// On Android, this will also require additional setup for the app,
+  /// especially in the app's `AndroidManifest.xml` file. Please see check the
+  /// readme for further details.
   Future<void> periodicallyShow(
     int id,
     String? title,
@@ -439,7 +411,7 @@ class FlutterLocalNotificationsPlugin {
     NotificationDetails notificationDetails, {
     String? payload,
     @Deprecated('Deprecated in favor of the androidScheduleMode parameter')
-        bool androidAllowWhileIdle = false,
+    bool androidAllowWhileIdle = false,
     AndroidScheduleMode? androidScheduleMode,
   }) async {
     if (kIsWeb) {
@@ -475,75 +447,6 @@ class FlutterLocalNotificationsPlugin {
       (allowWhileIdle
           ? AndroidScheduleMode.exactAllowWhileIdle
           : AndroidScheduleMode.exact);
-
-  /// Shows a notification on a daily interval at the specified time.
-  @Deprecated(
-      'Deprecated due to problems with time zones. Use zonedSchedule instead '
-      'by passing a date in the future with the same time and pass '
-      'DateTimeComponents.matchTime as the value of the '
-      'matchDateTimeComponents parameter.')
-  Future<void> showDailyAtTime(
-    int id,
-    String? title,
-    String? body,
-    Time notificationTime,
-    NotificationDetails notificationDetails, {
-    String? payload,
-  }) async {
-    if (kIsWeb) {
-      return;
-    }
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      await resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
-          ?.showDailyAtTime(
-              id, title, body, notificationTime, notificationDetails.android,
-              payload: payload);
-    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-      await resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>()
-          ?.showDailyAtTime(
-              id, title, body, notificationTime, notificationDetails.iOS,
-              payload: payload);
-    } else if (defaultTargetPlatform == TargetPlatform.macOS) {
-      throw UnimplementedError();
-    }
-  }
-
-  /// Shows a notification on weekly interval at the specified day and time.
-  @Deprecated(
-      'Deprecated due to problems with time zones. Use zonedSchedule instead '
-      'by passing a date in the future with the same day of the week and time '
-      'as well as passing DateTimeComponents.dayOfWeekAndTime as the value of '
-      'the matchDateTimeComponents parameter.')
-  Future<void> showWeeklyAtDayAndTime(
-    int id,
-    String? title,
-    String? body,
-    Day day,
-    Time notificationTime,
-    NotificationDetails notificationDetails, {
-    String? payload,
-  }) async {
-    if (kIsWeb) {
-      return;
-    }
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      await resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
-          ?.showWeeklyAtDayAndTime(id, title, body, day, notificationTime,
-              notificationDetails.android,
-              payload: payload);
-    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-      await resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>()
-          ?.showWeeklyAtDayAndTime(
-              id, title, body, day, notificationTime, notificationDetails.iOS,
-              payload: payload);
-    } else if (defaultTargetPlatform == TargetPlatform.macOS) {
-      throw UnimplementedError();
-    }
-  }
 
   /// Returns a list of notifications pending to be delivered/shown.
   Future<List<PendingNotificationRequest>> pendingNotificationRequests() =>

@@ -303,9 +303,10 @@ class _HomePageState extends State<HomePage> {
           flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>();
 
-      final bool? granted = await androidImplementation?.requestPermission();
+      final bool? grantedNotificationPermission =
+          await androidImplementation?.requestNotificationsPermission();
       setState(() {
-        _notificationsEnabled = granted ?? false;
+        _notificationsEnabled = grantedNotificationPermission ?? false;
       });
     }
   }
@@ -882,6 +883,20 @@ class _HomePageState extends State<HomePage> {
                         await _showNotificationWithTimeSensitiveInterruptionLevel();
                       },
                     ),
+                    PaddedElevatedButton(
+                      buttonText: 'Show notification with banner but not in '
+                          'notification centre',
+                      onPressed: () async {
+                        await _showNotificationWithBannerNotInNotificationCentre();
+                      },
+                    ),
+                    PaddedElevatedButton(
+                      buttonText:
+                          'Show notification in notification centre only',
+                      onPressed: () async {
+                        await _showNotificationInNotificationCentreOnly();
+                      },
+                    ),
                   ],
                   if (!kIsWeb && Platform.isLinux) ...<Widget>[
                     const Text(
@@ -1338,7 +1353,9 @@ class _HomePageState extends State<HomePage> {
       sound: RawResourceAndroidNotificationSound('slow_spring_board'),
     );
     const DarwinNotificationDetails darwinNotificationDetails =
-        DarwinNotificationDetails(sound: 'slow_spring_board.aiff');
+        DarwinNotificationDetails(
+      sound: 'slow_spring_board.aiff',
+    );
     final LinuxNotificationDetails linuxPlatformChannelSpecifics =
         LinuxNotificationDetails(
       sound: AssetsLinuxSound('sound/slow_spring_board.mp3'),
@@ -1423,7 +1440,9 @@ class _HomePageState extends State<HomePage> {
             playSound: false,
             styleInformation: DefaultStyleInformation(true, true));
     const DarwinNotificationDetails darwinNotificationDetails =
-        DarwinNotificationDetails(presentSound: false);
+        DarwinNotificationDetails(
+      presentSound: false,
+    );
     const NotificationDetails notificationDetails = NotificationDetails(
         android: androidNotificationDetails,
         iOS: darwinNotificationDetails,
@@ -2083,7 +2102,9 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _showNotificationWithSubtitle() async {
     const DarwinNotificationDetails darwinNotificationDetails =
-        DarwinNotificationDetails(subtitle: 'the subtitle');
+        DarwinNotificationDetails(
+      subtitle: 'the subtitle',
+    );
     const NotificationDetails notificationDetails = NotificationDetails(
         iOS: darwinNotificationDetails, macOS: darwinNotificationDetails);
     await flutterLocalNotificationsPlugin.show(
@@ -2109,7 +2130,9 @@ class _HomePageState extends State<HomePage> {
       String threadIdentifier,
     ) {
       final DarwinNotificationDetails darwinNotificationDetails =
-          DarwinNotificationDetails(threadIdentifier: threadIdentifier);
+          DarwinNotificationDetails(
+        threadIdentifier: threadIdentifier,
+      );
       return NotificationDetails(
           iOS: darwinNotificationDetails, macOS: darwinNotificationDetails);
     }
@@ -2137,13 +2160,46 @@ class _HomePageState extends State<HomePage> {
   Future<void> _showNotificationWithTimeSensitiveInterruptionLevel() async {
     const DarwinNotificationDetails darwinNotificationDetails =
         DarwinNotificationDetails(
-            interruptionLevel: InterruptionLevel.timeSensitive);
+      interruptionLevel: InterruptionLevel.timeSensitive,
+    );
     const NotificationDetails notificationDetails = NotificationDetails(
         iOS: darwinNotificationDetails, macOS: darwinNotificationDetails);
     await flutterLocalNotificationsPlugin.show(
         id++,
         'title of time sensitive notification',
         'body of time sensitive notification',
+        notificationDetails,
+        payload: 'item x');
+  }
+
+  Future<void> _showNotificationWithBannerNotInNotificationCentre() async {
+    const DarwinNotificationDetails darwinNotificationDetails =
+        DarwinNotificationDetails(
+      presentBanner: true,
+      presentList: false,
+    );
+    const NotificationDetails notificationDetails = NotificationDetails(
+        iOS: darwinNotificationDetails, macOS: darwinNotificationDetails);
+    await flutterLocalNotificationsPlugin.show(
+        id++,
+        'title of banner notification',
+        'body of banner notification',
+        notificationDetails,
+        payload: 'item x');
+  }
+
+  Future<void> _showNotificationInNotificationCentreOnly() async {
+    const DarwinNotificationDetails darwinNotificationDetails =
+        DarwinNotificationDetails(
+      presentBanner: false,
+      presentList: true,
+    );
+    const NotificationDetails notificationDetails = NotificationDetails(
+        iOS: darwinNotificationDetails, macOS: darwinNotificationDetails);
+    await flutterLocalNotificationsPlugin.show(
+        id++,
+        'title of notification shown only in notification centre',
+        'body of notification shown only in notification centre',
         notificationDetails,
         payload: 'item x');
   }
@@ -2222,12 +2278,14 @@ class _HomePageState extends State<HomePage> {
     final String bigPicturePath = await _downloadAndSaveFile(
         'https://dummyimage.com/600x200', 'bigPicture.jpg');
     final DarwinNotificationDetails darwinNotificationDetails =
-        DarwinNotificationDetails(attachments: <DarwinNotificationAttachment>[
-      DarwinNotificationAttachment(
-        bigPicturePath,
-        hideThumbnail: hideThumbnail,
-      )
-    ]);
+        DarwinNotificationDetails(
+      attachments: <DarwinNotificationAttachment>[
+        DarwinNotificationAttachment(
+          bigPicturePath,
+          hideThumbnail: hideThumbnail,
+        )
+      ],
+    );
     final NotificationDetails notificationDetails = NotificationDetails(
         iOS: darwinNotificationDetails, macOS: darwinNotificationDetails);
     await flutterLocalNotificationsPlugin.show(
@@ -2241,19 +2299,21 @@ class _HomePageState extends State<HomePage> {
     final String bigPicturePath = await _downloadAndSaveFile(
         'https://dummyimage.com/600x200', 'bigPicture.jpg');
     final DarwinNotificationDetails darwinNotificationDetails =
-        DarwinNotificationDetails(attachments: <DarwinNotificationAttachment>[
-      DarwinNotificationAttachment(
-        bigPicturePath,
-        thumbnailClippingRect:
-            // lower right quadrant of the attachment
-            const DarwinNotificationAttachmentThumbnailClippingRect(
-          x: 0.5,
-          y: 0.5,
-          height: 0.5,
-          width: 0.5,
-        ),
-      )
-    ]);
+        DarwinNotificationDetails(
+      attachments: <DarwinNotificationAttachment>[
+        DarwinNotificationAttachment(
+          bigPicturePath,
+          thumbnailClippingRect:
+              // lower right quadrant of the attachment
+              const DarwinNotificationAttachmentThumbnailClippingRect(
+            x: 0.5,
+            y: 0.5,
+            height: 0.5,
+            width: 0.5,
+          ),
+        )
+      ],
+    );
     final NotificationDetails notificationDetails = NotificationDetails(
         iOS: darwinNotificationDetails, macOS: darwinNotificationDetails);
     await flutterLocalNotificationsPlugin.show(

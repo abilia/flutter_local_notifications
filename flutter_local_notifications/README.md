@@ -23,6 +23,7 @@ A cross platform plugin for displaying local notifications.
 - **[👏 Acknowledgements](#-acknowledgements)**
 - **[🔧 Android Setup](#-android-setup)**
    - [Gradle setup](#gradle-setup)
+   - [AndroidManifest.xml setup](#androidmanifestxml-setup)
    - [Requesting permissions on Android 13 or higher](#requesting-permissions-on-android-13-or-higher)
    - [Custom notification icons and sounds](#custom-notification-icons-and-sounds)
    - [Scheduled notifications](#scheduling-a-notification)
@@ -171,7 +172,7 @@ Due to some limitations on iOS with how it treats null values in dictionaries, a
 
 ## 🔧 Android Setup
 
-Before proceeding, please make sure you are using the latest version of the plugin. The reason for this is that since version 3.0.1+4, the amount of setup needed has been reduced. Previously, applications needed changes done to the `AndroidManifest.xml` file and there was a bit more setup needed for release builds. If for some reason, your application still needs to use an older version of the plugin then make use of the release tags to refer back to older versions of readme.
+Before proceeding, please make sure you are using the latest version of the plugin. Note that there have been differences in the setup depending on the version of the plugin used. Please make use of the release tags to refer back to older versions of readme. Applications that schedule notifications should pay close attention to the [AndroidManifest.xml setup](#androidmanifestxml-setup) section of the readme since Android 14 has brought about some behavioural changes.
 
 ### Gradle setup
 
@@ -193,18 +194,18 @@ android {
 }
 
 dependencies {
-  coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+  coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
 }
 ```
 
-Note that the plugin uses Android Gradle plugin 4.2.2 to leverage this functionality so applications would also need to use that version at a **minimum**. For a Flutter project, this is specified in `android/build.gradle` and the main parts would look similar to the following
+Note that the plugin uses Android Gradle plugin 7.3.1 to leverage this functionality so to errr on the safe side, applications should aim to use the same version at a **minimum**. Using a higher version is also needed as at point, Android Studio bundled a newer version of the Java SDK that will only work with Gradle 7.3 or higher (see [here](https://docs.flutter.dev/release/breaking-changes/android-java-gradle-migration-guide) for more details). For a Flutter project, this is specified in `android/build.gradle` and the main parts would look similar to the following
 
 ```gradle
 buildscript {
    ...
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.2'
+        classpath 'com.android.tools.build:gradle:7.3.1'
         ...
     }
 ```
@@ -230,6 +231,35 @@ android {
 }
 ```
 
+### AndroidManifest.xml setup
+
+Previously the plugin would specify all the permissions required all of the features that the plugin support in its own `AndroidManifest.xml` file so that developers wouldn't need to do this in their own app's `AndroidManifest.xml` file. Since version 16 onwards, the plugin will now only specify the bare minimum and these [`POST_NOTIFICATIONS`] (https://developer.android.com/reference/android/Manifest.permission#POST_NOTIFICATIONS) and [`VIBRATE`](https://developer.android.com/reference/android/Manifest.permission#VIBRATE) permissions.
+
+For apps that need the following functionality please the following in your app's `AndroidManifest.xml`
+
+* To schedule notifications the following changes are needed
+    * Specify the appropriate permissions between the `<manifest>` tags.
+        * `<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>`: this is required so the plugin can known when the device is rebooted. This is required so that the plugin can reschedule notifications upon a reboot
+        * If the app requires scheduling notifications with exact timings (aka exact alarms), there are two options since Android 14 brought about behavioural changes (see [here](https://developer.android.com/about/versions/14/changes/schedule-exact-alarms) for more details)
+            * specify `<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />` and call the `requestExactAlarmsPermission()` exposed by the `AndroidFlutterNotificationsPlugin` class so that the user can grant the permission via the app or
+            * specify `<uses-permission android:name="android.permission.USE_EXACT_ALARM" />`. Users will not be prompted to grant permission, however as per the official Android documentation on the `USE_EXACT_ALARM` permission (refer to [here](https://developer.android.com/about/versions/14/changes/schedule-exact-alarms#calendar-alarm-clock) and [here](https://developer.android.com/reference/android/Manifest.permission#USE_EXACT_ALARM)), this requires the app to target Android 13 (API level 33) or higher and could be subject to approval and auditing by the app store(s) used to publish theapp
+    * Specify the following between the `<application>` tags so that the plugin can actually show the scheduled notification(s)
+    ```xml
+    <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+    <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+        <intent-filter>
+            <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+            <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+        </intent-filter>
+    </receiver>
+    ```
+* To use full-screen intent notifications, specify the `<uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />` permission between the `<manifest>` tags.
+* To use notification actions, specify `<receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver" />` between the `<application>` tags so that the plugin can process the actions and trigger the appropriate callback(s)
+
+Developers can refer to the example app's `AndroidManifest.xml` to help see what the end result may look like. Do note that the example app covers all the plugin's supported functionality so will request more permissions than your own app may need
+
 ### Requesting permissions on Android 13 or higher
 
 From Android 13 (API level 33) onwards, apps now have the ability to display a prompt where users can decide if they want to grant an app permission to show notifications. For further reading on this matter read https://developer.android.com/guide/topics/ui/notifiers/notification-permission. To support this applications need target their application to Android 13 or higher and the compile SDK version needs to be at least 33 (Android 13). For example, to target Android 13, update your app's `build.gradle` file to have a `targetSdkVersion` of `33`. Applications can then call the following code to request the permission where the `requestPermission` method is associated with the `AndroidFlutterLocalNotificationsPlugin` class (i.e. the Android implementation of the plugin)
@@ -238,7 +268,7 @@ From Android 13 (API level 33) onwards, apps now have the ability to display a p
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
 flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-    AndroidFlutterLocalNotificationsPlugin>().requestPermission();
+    AndroidFlutterLocalNotificationsPlugin>().requestNotificationsPermission();
 ```
 
 ### Custom notification icons and sounds
@@ -323,7 +353,7 @@ flutterLocalNotificationsPlugin.initialize(initializationSettings,
 ...
 
 void onDidReceiveLocalNotification(
-    int id, String title, String body, String payload) async {
+    int id, String title?, String? body, String? payload) async {
   // display a dialog with the notification details, tap ok to go to another page
   showDialog(
     context: context,
@@ -357,7 +387,7 @@ If you encounter any issues please refer to the API docs and the sample code in 
 
 ### Notification Actions
 
-Notifications can now contain actions but note that on Apple's platforms, these only on iOS 10 or newer and macOS 10.14 or newer.  On macOS and Linux (see [Linux limitations](#linux-limitations) chapter), these will only run on the main isolate by calling the `onDidReceiveNotificationResponse` callback. On iOS and Android, these will run on the main isolate by calling the `onDidReceiveNotificationResponse` callback if the configuration has specified that the app/user interface should be shown i.e. by specifying the `DarwinNotificationActionOption.foreground` option on iOS and the `showsUserInterface` property on Android. If they haven't, then these actions may be selected by the user when an app is sleeping or terminated and will wake up your app. However, it may not wake up the user-visible part of your App; but only the part of it which runs in the background. This is done by spawning a background isolate.
+Notifications can now contain actions but note that on Apple's platforms, these work only on iOS 10 or newer and macOS 10.14 or newer.  On macOS and Linux (see [Linux limitations](#linux-limitations) chapter), these will only run on the main isolate by calling the `onDidReceiveNotificationResponse` callback. On iOS and Android, these will run on the main isolate by calling the `onDidReceiveNotificationResponse` callback if the configuration has specified that the app/user interface should be shown i.e. by specifying the `DarwinNotificationActionOption.foreground` option on iOS and the `showsUserInterface` property on Android. If they haven't, then these actions may be selected by the user when an app is sleeping or terminated and will wake up your app. However, it may not wake up the user-visible part of your App; but only the part of it which runs in the background. This is done by spawning a background isolate.
 
 This plugin contains handlers for iOS & Android to handle these background isolate cases and will allow you to specify a Dart entry point (a function).
 When the user selects a action, the plugin will start a **separate Flutter Engine** which will then invoke the `onDidReceiveBackgroundNotificationResponse` callback
@@ -422,18 +452,18 @@ On iOS/macOS, notification actions need to be configured before the app is start
 final DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
     // ...
     notificationCategories: [
-    const DarwinNotificationCategory(
+      DarwinNotificationCategory(
         'demoCategory',
-        <DarwinNotificationAction>[
-            DarwinNotificationAction('id_1', 'Action 1'),
-            DarwinNotificationAction(
+        actions: <DarwinNotificationAction>[
+            DarwinNotificationAction.plain('id_1', 'Action 1'),
+            DarwinNotificationAction.plain(
             'id_2',
             'Action 2',
             options: <DarwinNotificationActionOption>{
                 DarwinNotificationActionOption.destructive,
             },
             ),
-            DarwinNotificationAction(
+            DarwinNotificationAction.plain(
             'id_3',
             'Action 3',
             options: <DarwinNotificationActionOption>{
