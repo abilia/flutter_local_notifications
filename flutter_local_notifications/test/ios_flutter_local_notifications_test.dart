@@ -20,8 +20,8 @@ void main() {
     setUp(() {
       debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
       flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-      // ignore: always_specify_types
-      channel.setMockMethodCallHandler((methodCall) async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
         log.add(methodCall);
         if (methodCall.method == 'pendingNotificationRequests') {
           return <Map<String, Object>?>[];
@@ -30,6 +30,7 @@ void main() {
         } else if (methodCall.method == 'getNotificationAppLaunchDetails') {
           return null;
         }
+        return null;
       });
     });
 
@@ -48,10 +49,13 @@ void main() {
           'requestAlertPermission': true,
           'requestSoundPermission': true,
           'requestBadgePermission': true,
+          'requestProvisionalPermission': false,
           'requestCriticalPermission': false,
           'defaultPresentAlert': true,
           'defaultPresentSound': true,
           'defaultPresentBadge': true,
+          'defaultPresentBanner': true,
+          'defaultPresentList': true,
           'notificationCategories': <String>[],
         })
       ]);
@@ -104,10 +108,13 @@ void main() {
           'requestAlertPermission': true,
           'requestSoundPermission': true,
           'requestBadgePermission': true,
+          'requestProvisionalPermission': false,
           'requestCriticalPermission': false,
           'defaultPresentAlert': true,
           'defaultPresentSound': true,
           'defaultPresentBadge': true,
+          'defaultPresentBanner': true,
+          'defaultPresentList': true,
           'notificationCategories': <Map<String, dynamic>>[
             <String, dynamic>{
               'identifier': 'category1',
@@ -160,12 +167,15 @@ void main() {
     test('initialize with all settings off', () async {
       const DarwinInitializationSettings iosInitializationSettings =
           DarwinInitializationSettings(
-              requestAlertPermission: false,
-              requestBadgePermission: false,
-              requestSoundPermission: false,
-              defaultPresentAlert: false,
-              defaultPresentBadge: false,
-              defaultPresentSound: false);
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false,
+        defaultPresentAlert: false,
+        defaultPresentBadge: false,
+        defaultPresentSound: false,
+        defaultPresentBanner: false,
+        defaultPresentList: false,
+      );
       const InitializationSettings initializationSettings =
           InitializationSettings(iOS: iosInitializationSettings);
       await flutterLocalNotificationsPlugin.initialize(initializationSettings);
@@ -174,10 +184,13 @@ void main() {
           'requestAlertPermission': false,
           'requestSoundPermission': false,
           'requestBadgePermission': false,
+          'requestProvisionalPermission': false,
           'requestCriticalPermission': false,
           'defaultPresentAlert': false,
           'defaultPresentSound': false,
           'defaultPresentBadge': false,
+          'defaultPresentBanner': false,
+          'defaultPresentList': false,
           'notificationCategories': <String>[],
         })
       ]);
@@ -213,6 +226,8 @@ void main() {
           presentAlert: true,
           presentBadge: true,
           presentSound: true,
+          presentBanner: true,
+          presentList: true,
           subtitle: 'a subtitle',
           sound: 'sound.mp3',
           badgeNumber: 1,
@@ -238,6 +253,8 @@ void main() {
               'presentAlert': true,
               'presentBadge': true,
               'presentSound': true,
+              'presentBanner': true,
+              'presentList': true,
               'subtitle': 'a subtitle',
               'sound': 'sound.mp3',
               'badgeNumber': 1,
@@ -273,6 +290,8 @@ void main() {
                 presentAlert: true,
                 presentBadge: true,
                 presentSound: true,
+                presentBanner: true,
+                presentList: true,
                 sound: 'sound.mp3',
                 badgeNumber: 1,
                 attachments: <DarwinNotificationAttachment>[
@@ -307,6 +326,8 @@ void main() {
                     'presentAlert': true,
                     'presentBadge': true,
                     'presentSound': true,
+                    'presentBanner': true,
+                    'presentList': true,
                     'subtitle': null,
                     'sound': 'sound.mp3',
                     'badgeNumber': 1,
@@ -347,6 +368,8 @@ void main() {
                 presentAlert: true,
                 presentBadge: true,
                 presentSound: true,
+                presentBanner: true,
+                presentList: true,
                 sound: 'sound.mp3',
                 badgeNumber: 1,
                 attachments: <DarwinNotificationAttachment>[
@@ -380,6 +403,8 @@ void main() {
                 'presentAlert': true,
                 'presentBadge': true,
                 'presentSound': true,
+                'presentBanner': true,
+                'presentList': true,
                 'subtitle': null,
                 'sound': 'sound.mp3',
                 'badgeNumber': 1,
@@ -414,6 +439,8 @@ void main() {
                 presentAlert: true,
                 presentBadge: true,
                 presentSound: true,
+                presentBanner: true,
+                presentList: true,
                 sound: 'sound.mp3',
                 badgeNumber: 1,
                 attachments: <DarwinNotificationAttachment>[
@@ -449,6 +476,8 @@ void main() {
                 'presentAlert': true,
                 'presentBadge': true,
                 'presentSound': true,
+                'presentBanner': true,
+                'presentList': true,
                 'subtitle': null,
                 'sound': 'sound.mp3',
                 'badgeNumber': 1,
@@ -483,6 +512,8 @@ void main() {
                 presentAlert: true,
                 presentBadge: true,
                 presentSound: true,
+                presentBanner: true,
+                presentList: true,
                 sound: 'sound.mp3',
                 badgeNumber: 1,
                 attachments: <DarwinNotificationAttachment>[
@@ -519,6 +550,8 @@ void main() {
                 'presentAlert': true,
                 'presentBadge': true,
                 'presentSound': true,
+                'presentBanner': true,
+                'presentList': true,
                 'subtitle': null,
                 'sound': 'sound.mp3',
                 'badgeNumber': 1,
@@ -547,6 +580,7 @@ void main() {
           'sound': false,
           'badge': false,
           'alert': false,
+          'provisional': false,
           'critical': false,
         })
       ]);
@@ -559,6 +593,7 @@ void main() {
             sound: true,
             badge: true,
             alert: true,
+            provisional: true,
             critical: true,
           );
       expect(log, <Matcher>[
@@ -566,6 +601,7 @@ void main() {
           'sound': true,
           'badge': true,
           'alert': true,
+          'provisional': true,
           'critical': true,
         })
       ]);
