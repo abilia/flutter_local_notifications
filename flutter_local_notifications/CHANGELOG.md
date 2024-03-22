@@ -1,3 +1,39 @@
+# [17.0.0]
+
+* [Android] **Breaking change** bumped `compileSdk` to 34 and updated readme to mention this
+* Updated `compileSdk` and `targetSdkVersion` of example app to 34
+* **Important announcement** given how both quickly both Flutter ecosystem and Android ecosystem evolves, the minimum Flutter SDK version will be bumped to make it easier to maintain the plugin. Note that official plugins already follow a similar approach e.g. have a minimum Flutter SDK version of 3.13. This is being called out as if this affects your applications (e.g. supported OS versions) then you may need to consider maintaining your own fork in the future
+* Updated build status badge shown on readme to sync to recent changes on using GitHub Actions
+* Fixed code snippet in readme related to handling the `onDidReceiveLocalNotification` callback. Thanks to the PR from [Sanket Patel](https://github.com/s4nk37)
+
+# [16.3.3]
+
+* [Android] added missing check on if `SCHEDULE_EXACT_ALARM` permission was granted when using the `alarmClock` as the `AndroidScheduleMode`
+* Bumped `device_info_plus` dependency for example app, which means example app requires Flutter SDK version 3.3.0 or higher to run
+
+# [16.3.2]
+
+* [Android] fixed how native stack traces were obtained. Relates to issue [2088](https://github.com/MaikuB/flutter_local_notifications/issues/2088). Thanks to the PR from [Jonas Uekötter](https://github.com/ueman)
+
+
+# [16.3.1+1]
+
+* [iOS] added privacy manifest
+
+# [16.3.1]
+
+* Added missing acknowledgement for readme fix in 16.3.0
+* [Android] fixed issue [2136](https://github.com/MaikuB/flutter_local_notifications/issues/2136) where notifications on scheduled using older versions of the plugin  (likely before the `androidAllowWhileIdle` flag was added) could fail to work. This issue started occuring in 14.0 where support for inexact notifications was added using the `ScheduleMode` enum that was added and resulted in the deprecation of `androidAllowWhileIdle`. A mechanism was added to help "migrate" old notifications that wouldn't have this flag so that it results in a notification scheduled with exact timing as per the old behaviour. Thanks to the PR from [Ruchi Purohit](https://github.com/RuchiPurohit). Note that this release is to include hotfix that was made as part of the 14.1.5 and 15.1.3 hotfix releases
+
+# [16.3.0]
+
+* [iOS][macOS] added the `checkPermissions()` method to the `IOSFlutterLocalNotificationsPlugin` and `MacOSFlutterLocalNotificationsPlugin` classes respectively. This can be use to check the notification permissions granted to the app. Thanks to the PR from [Konstantin Dovnar](https://github.com/Vorkytaka)
+* Fixed part of the readme where a word was missing in the "AndroidManifest.xml setup" section. Thanks to the PR from [Gavin Douch](https://github.com/Coedice)
+
+# [16.2.0]
+
+* [Android] added the `silent` property to the `AndroidNotificationDetails` that allows specifying a notification on Android to be silent even if associated the notification channel allows for sounds to be played. Thanks to the PR from [aa-euclidk](https://github.com/aa-euclidk)
+
 # [16.1.0]
 
 * [Android] calling the `requestExactAlarmsPermission()` method will now go directly to the alarm settings screen specific to the app instead the general alarm settings screen where users needed to pick the app they wanted to change the settings for. Thanks to the PR from [ShunMc](https://github.com/ShunMc)
@@ -21,6 +57,10 @@
 * Updated example app so that the Android side specifies minimum SDK version version that aligns with what's specified by the Flutter SDK
 * Fixed Dart API docs for `DarwinNotificationDetails` class where `this This` was being repeated. Thanks to the PR from [Adrian Jagielak](https://github.com/adrianjagielak)
 * Fixed example code shown at the "Handling notifications whilst the app is in the foreground" section of the readme. Thanks to the PR from [Tinh Huynh](https://github.com/TinhHuynh)
+
+# [15.1.3]
+
+* [Android] fixed issue [2136](https://github.com/MaikuB/flutter_local_notifications/issues/2136) where notifications on scheduled using older versions of the plugin  (likely before the `androidAllowWhileIdle` flag was added) could fail to work. This issue started occuring in 14.0 where support for inexact notifications was added using the `ScheduleMode` enum that was added and resulted in the deprecation of `androidAllowWhileIdle`. A mechanism was added to help "migrate" old notifications that wouldn't have this flag so that it results in a notification scheduled with exact timing as per the old behaviour. Thanks to the PR from [Ruchi Purohit](https://github.com/RuchiPurohit). Note that this release is to include hotfix that was made as part of the 14.1.5 hotfix release
 
 # [15.1.2]
 
@@ -52,6 +92,10 @@
 * [Android] updated tags used when writing error logs. For corrupt scheduled notifications and error is logged the tag is now `ScheduledNotifReceiver` instead of `ScheduledNotifReceiver`. When logging that exact alarm permissions have been revoked the the tag is now `FLTLocalNotifPlugin` instead of `notification`
 * Updated API documentation related to the iOS/macOS notification presentation options to include links to Apple's documentations to show what they correspond to
 * Fixed typo in API docs for `initialize()` method
+
+# [14.1.5]
+
+* [Android] fixed issue [2136](https://github.com/MaikuB/flutter_local_notifications/issues/2136) where notifications on scheduled using older versions of the plugin  (likely before the `androidAllowWhileIdle` flag was added) could fail to work. This issue started occuring in 14.0 where support for inexact notifications was added using the `ScheduleMode` enum that was added and resulted in the deprecation of `androidAllowWhileIdle`. A mechanism was added to help "migrate" old notifications that wouldn't have this flag so that it results in a notification scheduled with exact timing as per the old behaviour. Thanks to the PR from [Ruchi Purohit](https://github.com/RuchiPurohit)
 
 # [14.1.4]
 
