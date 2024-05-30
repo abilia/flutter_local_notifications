@@ -63,7 +63,7 @@ public class ScheduledNotificationReceiver extends BroadcastReceiver {
       Log.v(TAG, notificationDetails.toString());
       final boolean locked = FlutterLocalNotificationsPlugin.isKeyguardLocked(context);
       Log.v(TAG, "locked: " + locked);
-      Log.v(TAG, "notificationDetails.showNotification " + notificationDetails.showNotification );
+      Log.v(TAG, "notificationDetails.showNotification " + notificationDetails.showNotification);
 
       if (notificationDetails.showNotification == null
           || notificationDetails.showNotification
