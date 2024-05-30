@@ -26,8 +26,10 @@ public class ScheduledNotificationReceiver extends BroadcastReceiver {
   @Override
   @SuppressWarnings("deprecation")
   public void onReceive(final Context context, Intent intent) {
+    Log.v(TAG, "onReceive " + intent.getAction());
     String notificationDetailsJson =
         intent.getStringExtra(FlutterLocalNotificationsPlugin.NOTIFICATION_DETAILS);
+    Log.v(TAG, notificationDetailsJson);
     if (StringUtils.isNullOrEmpty(notificationDetailsJson)) {
       // This logic is needed for apps that used the plugin prior to 0.3.4
 
@@ -58,7 +60,11 @@ public class ScheduledNotificationReceiver extends BroadcastReceiver {
       Gson gson = FlutterLocalNotificationsPlugin.buildGson();
       Type type = new TypeToken<NotificationDetails>() {}.getType();
       NotificationDetails notificationDetails = gson.fromJson(notificationDetailsJson, type);
+      Log.v(TAG, notificationDetails.toString());
       final boolean locked = FlutterLocalNotificationsPlugin.isKeyguardLocked(context);
+      Log.v(TAG, "locked: " + locked);
+      Log.v(TAG, "notificationDetails.showNotification " + notificationDetails.showNotification );
+
       if (notificationDetails.showNotification == null
           || notificationDetails.showNotification
           || locked) {
@@ -69,7 +75,11 @@ public class ScheduledNotificationReceiver extends BroadcastReceiver {
       boolean firstAlarm =
           LocalDateTime.parse(notificationDetails.scheduledDateTime).getSecond() == 0;
       boolean hasStartActivity = notificationDetails.startActivityClassName != null;
+      Log.v(TAG, "hasStartActivity: " + hasStartActivity);
+      Log.v(TAG, "firstAlarm: " + firstAlarm);
+
       if (hasStartActivity && (!locked || !firstAlarm)) {
+        Log.v(TAG, "startAlarmActivity: " + notificationDetails);
         FlutterLocalNotificationsPlugin.startAlarmActivity(context, notificationDetails);
       }
     }

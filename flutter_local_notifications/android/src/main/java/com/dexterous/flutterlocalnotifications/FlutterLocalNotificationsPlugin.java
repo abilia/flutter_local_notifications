@@ -1344,10 +1344,12 @@ public class FlutterLocalNotificationsPlugin
 
   static void startAlarmActivity(final Context context, NotificationDetails notificationDetails) {
     Intent intent = getLaunchIntent(context, notificationDetails);
+    Log.v("startAlarmActivity", "intent: " + intent);
     intent.setAction(SELECT_NOTIFICATION);
     intent.putExtra(PAYLOAD, notificationDetails.payload);
     intent.addFlags(Intent.FLAG_FROM_BACKGROUND);
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    Log.v("startAlarmActivity", "intent end: " + intent);
     context.startActivity(intent);
   }
 
