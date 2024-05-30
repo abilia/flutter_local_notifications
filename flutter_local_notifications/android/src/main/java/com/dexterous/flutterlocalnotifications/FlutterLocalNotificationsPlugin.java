@@ -1556,6 +1556,8 @@ public class FlutterLocalNotificationsPlugin
         activeNotificationPayload.put(
             "title", notification.extras.getCharSequence("android.title"));
         activeNotificationPayload.put("body", notification.extras.getCharSequence("android.text"));
+        activeNotificationPayload.put(
+            "bigText", notification.extras.getCharSequence("android.bigText"));
         activeNotificationsPayload.add(activeNotificationPayload);
       }
       result.success(activeNotificationsPayload);
@@ -2101,6 +2103,12 @@ public class FlutterLocalNotificationsPlugin
       channelPayload.put("vibrationPattern", channel.getVibrationPattern());
       channelPayload.put("enableLights", channel.shouldShowLights());
       channelPayload.put("ledColor", channel.getLightColor());
+      final AudioAttributes audioAttributes = channel.getAudioAttributes();
+      channelPayload.put(
+          "audioAttributesUsage",
+          audioAttributes == null
+              ? AudioAttributes.USAGE_NOTIFICATION
+              : audioAttributes.getUsage());
     }
     return channelPayload;
   }

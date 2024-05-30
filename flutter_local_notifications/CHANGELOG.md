@@ -1,3 +1,23 @@
+## [17.1.2]
+
+* [Android] fixed issue [2318](https://github.com/MaikuB/flutter_local_notifications/issues/2318) where an exception could occur on calling the `getNotificationChannels()` method from the `AndroidFlutterLocalNotificationsPlugin` class. This happened when Android found that the audio attributes associated with the channel was null. The plugin will now coalesce the null value to indicate that the usage of the audio is for notifications as per https://developer.android.com/reference/android/media/AudioAttributes#USAGE_NOTIFICATION. On the Dart side, this would correspond to the [AudioAttributesUsage.notification](https://pub.dev/documentation/flutter_local_notifications/latest/flutter_local_notifications/AudioAttributesUsage.html#notification) enum value
+
+## [17.1.1]
+
+* [Android] fixes issue [#2299](https://github.com/MaikuB/flutter_local_notifications/issues/2299) where within the range of the max integer value of epoch time passed to a messaging style would result in a casting exception
+
+## [17.1.0]
+
+* [Android] `bigText` has added to `ActiveNotification` that allows getting information about the longer text associated with a notification displayed using the big text style. Thanks to the PR from [vulpeep](https://github.com/vulpeep)
+* [Android] added `audioAttributesUsage` to `AndroidNotificationChannel`. Thanks to the PR from [Dithesh](https://github.com/ditheshthegreat)
+* Fix description of the behaviour iOS pending notifications limit. Thanks to the PR from [Amman Zaman](https://github.com/zamanzamzz)
+* Updated link in readme to Gradle desugaring setup. Thanks to the PR from [James Allen](https://github.com/jamesncl)
+
+
+# [17.0.1]
+
+* [iOS] updated privacy manifest to declare reason the plugin uses the User Defaults API. Thanks to the PR from [Miya49-p0](https://github.com/Miya49-p0)
+
 # [17.0.0]
 
 * [Android] **Breaking change** bumped `compileSdk` to 34 and updated readme to mention this

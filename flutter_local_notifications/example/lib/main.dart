@@ -2682,7 +2682,9 @@ class _HomePageState extends State<HomePage> {
                     'title: ${activeNotification.title}\n'
                     'body: ${activeNotification.body}',
                   ),
-                  if (Platform.isAndroid && activeNotification.id != null)
+                  if (Platform.isAndroid &&
+                      activeNotification.id != null) ...<Widget>[
+                    Text('bigText: ${activeNotification.bigText}'),
                     TextButton(
                       child: const Text('Get messaging style'),
                       onPressed: () {
@@ -2690,6 +2692,7 @@ class _HomePageState extends State<HomePage> {
                             activeNotification.id!, activeNotification.tag);
                       },
                     ),
+                  ],
                   const Divider(color: Colors.black),
                 ],
               ),
@@ -2858,7 +2861,8 @@ class _HomePageState extends State<HomePage> {
                         'vibrationPattern: ${channel.vibrationPattern}\n'
                         'showBadge: ${channel.showBadge}\n'
                         'enableLights: ${channel.enableLights}\n'
-                        'ledColor: ${channel.ledColor}\n'),
+                        'ledColor: ${channel.ledColor}\n'
+                        'audioAttributesUsage: ${channel.audioAttributesUsage}\n'),
                     const Divider(color: Colors.black),
                   ],
                 ),
