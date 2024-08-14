@@ -2576,7 +2576,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       payload: 'long payload',
-      androidAllowWhileIdle: true,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.wallClockTime,
     );
