@@ -737,6 +737,8 @@ void main() {
               'additionalFlags': null,
               'fullScreenIntent': false,
               'shortcutId': null,
+              'startActivityClassName': null,
+              'showNotification': true,
               'subText': null,
               'style': AndroidNotificationStyle.defaultStyle.index,
               'styleInformation': <String, Object>{
@@ -2184,6 +2186,8 @@ void main() {
                         'category': null,
                         'additionalFlags': null,
                         'fullScreenIntent': false,
+                        'startActivityClassName': null,
+                        'showNotification': true,
                         'shortcutId': null,
                         'subText': null,
                         'style': AndroidNotificationStyle.defaultStyle.index,
