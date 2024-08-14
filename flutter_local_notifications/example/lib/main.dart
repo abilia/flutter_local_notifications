@@ -450,6 +450,12 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                     PaddedElevatedButton(
+                      buttonText: 'Repeat notification every 5 minutes',
+                      onPressed: () async {
+                        await _repeatPeriodicallyWithDurationNotification();
+                      },
+                    ),
+                    PaddedElevatedButton(
                       buttonText:
                           'Schedule daily 10:00:00 am notification in your '
                           'local time zone',
@@ -757,6 +763,13 @@ class _HomePageState extends State<HomePage> {
                       buttonText: 'Show notification with chronometer',
                       onPressed: () async {
                         await _showNotificationWithChronometer();
+                      },
+                    ),
+                    PaddedElevatedButton(
+                      buttonText:
+                          'Request full-screen intent permission (API 34+)',
+                      onPressed: () async {
+                        await _requestFullScreenIntentPermission();
                       },
                     ),
                     PaddedElevatedButton(
@@ -1276,6 +1289,28 @@ class _HomePageState extends State<HomePage> {
         payload: 'item x');
   }
 
+  Future<void> _requestFullScreenIntentPermission() async {
+    final bool permissionGranted = await flutterLocalNotificationsPlugin
+            .resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin>()
+            ?.requestFullScreenIntentPermission() ??
+        false;
+    await showDialog<void>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+              content: Text(
+                  'Full screen intent permission granted: $permissionGranted'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ));
+  }
+
   Future<void> _showFullScreenNotification() async {
     await showDialog(
       context: context,
@@ -1283,7 +1318,8 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Turn off your screen'),
         content: const Text(
             'to see the full-screen intent in 5 seconds, press OK and TURN '
-            'OFF your screen'),
+            'OFF your screen. Note that the full-screen intent permission must '
+            'be granted for this to work too'),
         actions: <Widget>[
           TextButton(
             onPressed: () {
@@ -1901,6 +1937,23 @@ class _HomePageState extends State<HomePage> {
       'repeating title',
       'repeating body',
       RepeatInterval.everyMinute,
+      notificationDetails,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
+  }
+
+  Future<void> _repeatPeriodicallyWithDurationNotification() async {
+    const AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails(
+            'repeating channel id', 'repeating channel name',
+            channelDescription: 'repeating description');
+    const NotificationDetails notificationDetails =
+        NotificationDetails(android: androidNotificationDetails);
+    await flutterLocalNotificationsPlugin.periodicallyShowWithDuration(
+      id++,
+      'repeating period title',
+      'repeating period body',
+      const Duration(minutes: 5),
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
@@ -2682,7 +2735,9 @@ class _HomePageState extends State<HomePage> {
                     'title: ${activeNotification.title}\n'
                     'body: ${activeNotification.body}',
                   ),
-                  if (Platform.isAndroid && activeNotification.id != null)
+                  if (Platform.isAndroid &&
+                      activeNotification.id != null) ...<Widget>[
+                    Text('bigText: ${activeNotification.bigText}'),
                     TextButton(
                       child: const Text('Get messaging style'),
                       onPressed: () {
@@ -2690,6 +2745,7 @@ class _HomePageState extends State<HomePage> {
                             activeNotification.id!, activeNotification.tag);
                       },
                     ),
+                  ],
                   const Divider(color: Colors.black),
                 ],
               ),
@@ -2858,7 +2914,8 @@ class _HomePageState extends State<HomePage> {
                         'vibrationPattern: ${channel.vibrationPattern}\n'
                         'showBadge: ${channel.showBadge}\n'
                         'enableLights: ${channel.enableLights}\n'
-                        'ledColor: ${channel.ledColor}\n'),
+                        'ledColor: ${channel.ledColor}\n'
+                        'audioAttributesUsage: ${channel.audioAttributesUsage}\n'),
                     const Divider(color: Colors.black),
                   ],
                 ),
