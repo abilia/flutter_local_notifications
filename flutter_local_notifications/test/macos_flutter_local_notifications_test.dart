@@ -9,6 +9,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'utils/date_formatter.dart';
 
 void main() {
+  MacOSFlutterLocalNotificationsPlugin.registerWith();
   TestWidgetsFlutterBinding.ensureInitialized();
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   group('macOS', () {
@@ -411,15 +412,12 @@ void main() {
         );
 
         await flutterLocalNotificationsPlugin.zonedSchedule(
-          1,
-          'notification title',
-          'notification body',
-          scheduledDate,
-          notificationDetails,
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-        );
+            1,
+            'notification title',
+            'notification body',
+            scheduledDate,
+            notificationDetails,
+            androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle);
 
         expect(
             log.last,
@@ -489,8 +487,6 @@ void main() {
           scheduledDate,
           notificationDetails,
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
           matchDateTimeComponents: DateTimeComponents.time,
         );
 
@@ -567,8 +563,6 @@ void main() {
           scheduledDate,
           notificationDetails,
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
           matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
         );
 

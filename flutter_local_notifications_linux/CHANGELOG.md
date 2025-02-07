@@ -1,4 +1,8 @@
-## [vNext]
+## [5.0.1-dev.1]
+
+* Bumped `flutter_local_notifications_platform_interface` dependency
+
+## [5.0.0]
 
 * **Breaking change** Bumped minimum Flutter SDK requirement to 3.13
 
