@@ -32,6 +32,7 @@ A cross platform plugin for displaying local notifications.
    - [Scheduled notifications](#scheduling-a-notification)
    - [Fullscreen intent notifications](#full-screen-intent-notifications)
    - [Release build configuration](#release-build-configuration)
+     - [ProGuard rules](#proguard-rules)
 - **[🔧 iOS setup](#-ios-setup)**
    - [General setup](#general-setup)
    - [Handling notifications whilst the app is in the foreground](#handling-notifications-whilst-the-app-is-in-the-foreground)
@@ -61,7 +62,7 @@ A cross platform plugin for displaying local notifications.
 * **Linux**. Uses the [Desktop Notifications Specification](https://specifications.freedesktop.org/notification-spec/)
 * **Windows** Uses the [C++/WinRT](https://learn.microsoft.com/en-us/windows/uwp/cpp-and-winrt-apis/) implementation of [Toast Notifications](https://learn.microsoft.com/en-us/windows/apps/design/shell/tiles-and-notifications/toast-notifications-overview)
 
-Note: the plugin requires Flutter SDK 3.13 at a minimum. The list of support platforms for Flutter 3.13 itself can be found [here](https://github.com/flutter/website/blob/3d18ab48218101493af84953b71eac0cc6781fdd/src/reference/supported-platforms.md)
+Note: the plugin requires Flutter SDK 3.22 at a minimum. The list of support platforms for Flutter 3.22 itself can be found [here](https://github.com/flutter/website/blob/4fa26a1e909a2243fa18e4d101192bb5d400fcf2/src/_data/platforms.yml)
 
 ## ✨ Features
 
@@ -131,7 +132,7 @@ It has been reported that Samsung's implementation of Android has imposed a maxi
 
 ### iOS pending notifications limit
 
-There is a limit imposed by iOS where it will only keep the 64 notifications that were last set on any iOS versions newer than 9. On iOS versions 9 and older, the 64 notifications that fire soonest are kept. [See here for more details.](http://ileyf.cn.openradar.appspot.com/38065340)
+There is a limit imposed by iOS where it will only keep the 64 notifications that were last set on any iOS versions newer than 9. On iOS versions 9 and older, the 64 notifications that fire soonest are kept. [See here for more details.](https://ileyf.cn.openradar.appspot.com/38065340)
 
 ### Scheduled notifications and daylight saving time
 
@@ -170,13 +171,13 @@ Due to some limitations on iOS with how it treats null values in dictionaries, a
 
 ## 📷 Screenshots
 
-| Platform | Screenshot |
-| ------------- | ------------- |
-| Android | <img height="480" src="https://github.com/MaikuB/flutter_local_notifications/raw/master/images/android_notification.png"> |
-| iOS | <img height="414" src="https://github.com/MaikuB/flutter_local_notifications/raw/master/images/ios_notification.png"> |
-| macOS | <img src="https://github.com/MaikuB/flutter_local_notifications/raw/master/images/macos_notification.png"> |
-| Linux | <img src="https://github.com/MaikuB/flutter_local_notifications/raw/master/images/gnome_linux_notification.png"> <img src="https://github.com/MaikuB/flutter_local_notifications/raw/master/images/kde_linux_notification.png"> |
-| Windows | <img src="https://github.com/MaikuB/flutter_local_notifications/raw/master/images/windows_notification.png"> |
+| Platform | Screenshot                                                                                                                                                                                                                      |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Android  | <img height="480" src="https://github.com/MaikuB/flutter_local_notifications/raw/master/images/android_notification.png">                                                                                                       |
+| iOS      | <img height="414" src="https://github.com/MaikuB/flutter_local_notifications/raw/master/images/ios_notification.png">                                                                                                           |
+| macOS    | <img src="https://github.com/MaikuB/flutter_local_notifications/raw/master/images/macos_notification.png">                                                                                                                      |
+| Linux    | <img src="https://github.com/MaikuB/flutter_local_notifications/raw/master/images/gnome_linux_notification.png"> <img src="https://github.com/MaikuB/flutter_local_notifications/raw/master/images/kde_linux_notification.png"> |
+| Windows  | <img src="https://github.com/MaikuB/flutter_local_notifications/raw/master/images/windows_notification.png">                                                                                                                    |
 
 
 ## 👏 Acknowledgements
@@ -194,43 +195,109 @@ Before proceeding, please make sure you are using the latest version of the plug
 
 ### Gradle setup
 
-Version 10+ on the plugin now relies on [desugaring](https://developer.android.com/studio/write/java8-support#library-desugaring) to support scheduled notifications with backwards compatibility on older versions of Android. Developers will need to update their application's Gradle file at `android/app/build.gradle`. Please see the link on desugaring for details but the main parts needed in this Gradle file would be
+Version 10+ on the plugin now relies on [desugaring](https://developer.android.com/studio/write/java8-support#library-desugaring) to support scheduled notifications with backwards compatibility on older versions of Android. Developers will need to update their application's Gradle file to enable desugaring even if they don't use scheduled notifications. Please see the link on desugaring for details but for convenience, you can expand below to see the relevant portions based on if your app has a `build.gradle` or `build.gradle.kts` file
+
+<details>
+<summary>Groovy - build.gradle</summary>
 
 ```gradle
 android {
-  defaultConfig {
-    multiDexEnabled true
-  }
+    defaultConfig {
+        multiDexEnabled true
+    }
 
-  compileOptions {
-    // Flag to enable support for the new language APIs
-    coreLibraryDesugaringEnabled true
-    // Sets Java compatibility to Java 8
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
-  }
+    compileOptions {
+        // Flag to enable support for the new language APIs
+        coreLibraryDesugaringEnabled true
+        // Sets Java compatibility to Java 11
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }
 
 dependencies {
-  coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
 }
 ```
+</details>
 
-Note that the plugin uses Android Gradle plugin (AGP) 7.3.1 to leverage this functionality so to err on the safe side, applications should aim to use the same version at a **minimum**. Using a higher version is also needed as at point, Android Studio bundled a newer version of the Java SDK that will only work with Gradle 7.3 or higher (see [here](https://docs.flutter.dev/release/breaking-changes/android-java-gradle-migration-guide) for more details). For a Flutter app using the legacy `apply` script syntax, this is specified in `android/build.gradle` and the main parts would look similar to the following
+<details>
+<summary>Kotlin - build.gradle.kts</summary>
+
+```kotlin
+android {
+    defaultConfig {
+        multiDexEnabled = true
+    }
+
+    compileOptions {
+        // Flag to enable support for the new language APIs
+        isCoreLibraryDesugaringEnabled = true
+        // Sets Java compatibility to Java 11
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+  
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
+    }
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+}
+```
+</details>
+
+Note that the plugin uses Android Gradle plugin (AGP) 8.6.0 to leverage this functionality so to err on the safe side, applications should aim to use the same version at a **minimum**. If your application uses a higher version then there's no need to use a lower AGP version. For a Flutter app using the legacy `apply` script syntax, this is specified in `android/build.gradle` and the main parts would look similar to the following
 
 ```gradle
 buildscript {
    ...
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.1'
+        classpath 'com.android.tools.build:gradle:8.6.0'
         ...
     }
 ```
 
-If your app is using the new declarative Plugin DSL syntax, please refer to the Flutter documentation [here](https://docs.flutter.dev/release/breaking-changes/flutter-gradle-plugin-apply) where they document where the AGP version can be specified
+
+If your app is using the new declarative [Plugin DSL syntax](https://docs.flutter.dev/release/breaking-changes/flutter-gradle-plugin-apply), the file to update will be either `android/settings.gradle` or `android/settings.gradle.kts` and will be similar to the following
+
+<details>
+<summary>Groovy - settings.gradle</summary>
+
+```gradle
+plugins {
+    ...
+    id 'com.android.application' version '8.6.0' apply false
+    ...
+}
+```
+
+</details>
+
+<details>
+<summary>Kotlin - settings.gradle.kts</summary>
+
+```kotlin
+plugins {
+    ...
+    id("com.android.application") version "8.6.0" apply false
+    ...
+}
+```
+
+</details>
 
 There have been reports that enabling desugaring may result in a Flutter apps crashing on Android 12L and above. This would be an issue with Flutter itself, not the plugin. One possible fix is adding the [WindowManager library](https://developer.android.com/jetpack/androidx/releases/window) as a dependency:
+
+<details>
+<summary>Groovy - build.gradle</summary>
 
 ```gradle
 dependencies {
@@ -240,9 +307,27 @@ dependencies {
 }
 ```
 
+</details>
+
+<details>
+<summary>Kotlin - build.gradle.kts</summary>
+
+```gradle
+dependencies {
+    implementation("androidx.window:window:1.0.0")
+    implementation("androidx.window:window-java:1.0.0")
+    ...
+}
+```
+
+</details>
+
 More information and other proposed solutions can be found in [Flutter issue #110658](https://github.com/flutter/flutter/issues/110658).
 
 The plugin also requires that the `compileSdk` in your application's Gradle file is set to 35 at a minimum:
+
+<details>
+<summary>Groovy - build.gradle</summary>
 
 ```gradle
 android {
@@ -251,9 +336,23 @@ android {
 }
 ```
 
+</details>
+
+<details>
+<summary>Kotlin - build.gradle.kts</summary>
+
+```kotlin
+android {
+    compileSdk = 35
+    ...
+}
+```
+
+</details>
+
 ### AndroidManifest.xml setup
 
-Previously the plugin would specify all the permissions required all of the features that the plugin support in its own `AndroidManifest.xml` file so that developers wouldn't need to do this in their own app's `AndroidManifest.xml` file. Since version 16 onwards, the plugin will now only specify the bare minimum and these [`POST_NOTIFICATIONS`] (https://developer.android.com/reference/android/Manifest.permission#POST_NOTIFICATIONS) and [`VIBRATE`](https://developer.android.com/reference/android/Manifest.permission#VIBRATE) permissions.
+Previously the plugin would specify all the permissions required all of the features that the plugin support in its own `AndroidManifest.xml` file so that developers wouldn't need to do this in their own app's `AndroidManifest.xml` file. Since version 16 onwards, the plugin will now only specify the bare minimum and these [`POST_NOTIFICATIONS`](https://developer.android.com/reference/android/Manifest.permission#POST_NOTIFICATIONS) and [`VIBRATE`](https://developer.android.com/reference/android/Manifest.permission#VIBRATE) permissions.
 
 For apps that need the following functionality please complete the following in your app's `AndroidManifest.xml`
 
@@ -331,9 +430,13 @@ Developers should also be across Google's requirements on using full-screen inte
 
 ### Release build configuration
 
-Before creating the release build of your app (which is the default setting when building an APK or app bundle) you will need to customise your ProGuard configuration file as per this [link](https://developer.android.com/studio/build/shrink-code#keep-code). Rules specific to the GSON dependency being used by the plugin will need to be added. These rules can be found [here](https://github.com/google/gson/blob/master/examples/android-proguard-example/proguard.cfg). Whilst the example app has a Proguard rules (`proguard-rules.pro`) [here](https://github.com/MaikuB/flutter_local_notifications/blob/master/flutter_local_notifications/example/android/app/proguard-rules.pro), it is recommended that developers refer to the rules on the GSON repository in case they get updated over time.
-
 ⚠️ Ensure that you have configured the resources that should be kept so that resources like your notification icons aren't discarded by the R8 compiler by following the instructions [here](https://developer.android.com/studio/build/shrink-code#keep-resources). If you have chosen to use `@mipmap/ic_launcher` as the notification icon (against the official Android guidance), be sure to include this in the `keep.xml` file. If you fail to do this, notifications might be broken. In the worst case they will never show, instead silently failing when the system looks for a resource that has been removed. If they do still show, you might not see the icon you specified. The configuration used by the example app can be found [here](https://github.com/MaikuB/flutter_local_notifications/blob/master/flutter_local_notifications/example/android/app/src/main/res/raw/keep.xml) where it is specifying that all drawable resources should be kept, as well as the file used to play a custom notification sound (sound file is located [here](https://github.com/MaikuB/flutter_local_notifications/blob/master/flutter_local_notifications/example/android/app/src/main/res/raw/slow_spring_board.mp3)).
+
+#### ProGuard rules
+
+For flutter_local_notificaiton v19 and higher, the ProGuard rules are automatically provided by the GSON. The following documentation is for v18 and lower versions.
+
+Before creating the release build of your app (which is the default setting when building an APK or app bundle) you will need to customise your ProGuard configuration file as per this [link](https://developer.android.com/studio/build/shrink-code#keep-code). Rules specific to the GSON dependency being used by the plugin will need to be added. These rules can be found [here](https://github.com/google/gson/blob/main/examples/android-proguard-example/proguard.cfg). Whilst the example app has a Proguard rules (`proguard-rules.pro`) [here](https://github.com/MaikuB/flutter_local_notifications/blob/master/flutter_local_notifications/example/android/app/proguard-rules.pro), it is recommended that developers refer to the rules on the GSON repository in case they get updated over time.
 
 ## 🔧 iOS setup
 

@@ -54,6 +54,7 @@ public class FlutterLocalNotificationsPlugin: NSObject, FlutterPlugin, UNUserNot
         static let isBadgeEnabled = "isBadgeEnabled"
         static let isProvisionalEnabled = "isProvisionalEnabled"
         static let isCriticalEnabled = "isCriticalEnabled"
+        static let criticalSoundVolume = "criticalSoundVolume"
     }
 
     struct ErrorMessages {
@@ -277,7 +278,7 @@ public class FlutterLocalNotificationsPlugin: NSObject, FlutterPlugin, UNUserNot
                                 newActions.append(UNNotificationAction(
                                     identifier: identifier,
                                     title: title,
-                                    options: Converters.parseNotificationActionOptions(options)
+                                    options: FlutterLocalNotificationsConverters.parseNotificationActionOptions(options)
                                 ))
                             } else if type == "text" {
                                 let buttonTitle = action["buttonTitle"] as! String
@@ -285,7 +286,7 @@ public class FlutterLocalNotificationsPlugin: NSObject, FlutterPlugin, UNUserNot
                                 newActions.append(UNTextInputNotificationAction(
                                     identifier: identifier,
                                     title: title,
-                                    options: Converters.parseNotificationActionOptions(options),
+                                    options: FlutterLocalNotificationsConverters.parseNotificationActionOptions(options),
                                     textInputButtonTitle: buttonTitle,
                                     textInputPlaceholder: placeholder
                                 ))
@@ -299,7 +300,7 @@ public class FlutterLocalNotificationsPlugin: NSObject, FlutterPlugin, UNUserNot
                         intentIdentifiers: [],
                         hiddenPreviewsBodyPlaceholder: nil,
                         categorySummaryFormat: nil,
-                        options: Converters.parseNotificationCategoryOptions(category["options"] as! [NSNumber])
+                        options: FlutterLocalNotificationsConverters.parseNotificationCategoryOptions(category["options"] as! [NSNumber])
                     )
 
                     notificationCategories.insert(notificationCategory)
@@ -543,7 +544,17 @@ public class FlutterLocalNotificationsPlugin: NSObject, FlutterPlugin, UNUserNot
         var presentList = persistedPresentationOptions[MethodCallArguments.presentList] as! Bool
         if let platformSpecifics = arguments[MethodCallArguments.platformSpecifics] as? [String: AnyObject] {
             if let sound = platformSpecifics[MethodCallArguments.sound] as? String {
-                content.sound = UNNotificationSound.init(named: UNNotificationSoundName.init(sound))
+              content.sound = UNNotificationSound.init(named: UNNotificationSoundName.init(sound))
+            }
+
+            if #available(macOS 10.14, *) {
+              if let volume = platformSpecifics[MethodCallArguments.criticalSoundVolume] as? NSNumber {
+                    if let sound = platformSpecifics[MethodCallArguments.sound] as? String {
+                        content.sound = UNNotificationSound.criticalSoundNamed(UNNotificationSoundName(sound), withAudioVolume: volume.floatValue)
+                    } else {
+                        content.sound = UNNotificationSound.defaultCriticalSound(withAudioVolume: volume.floatValue)
+                    }
+                }
             }
             if let badgeNumber = platformSpecifics[MethodCallArguments.badgeNumber] as? NSNumber {
                 content.badge = badgeNumber

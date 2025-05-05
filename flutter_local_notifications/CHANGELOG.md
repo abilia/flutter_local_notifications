@@ -1,33 +1,31 @@
-## [19.0.0-dev.5]
+## [vNext]
+
+* Bumped `msix` dev dependency in example app. This to fix the [issue](https://github.com/YehudaKremer/msix/issues/303) where the `msix` package stopped being able to created MSIX installers
+
+## [19.1.0]
+
+* [iOS][macOS] added supported to specify the volume for critical alerts. Thanks to the PR from [bannzai](https://github.com/bannzai)
+* Updated Gradle setup information in the readme to clarify that desugaring needs to be enabled even if scheduled notifications aren't used
+
+## [19.0.0]
 
 * [Android] **Breaking change** bumped `compileSdk` to 35 and updated readme to mention this
+* [Android] bumped GSON dependency to 2.12. As a result of doing so, applications should no longer need ProGuard rules related to this plugin that were needed for release builds to function. The readme has been updated to remove the associated setup to reflect this. Thanks to the PR from [Koji Wakamiya](https://github.com/koji-1009)
+* [Android] bumped Android Gradle Plugin to 8.6.0 to align with the [minimum version](https://developer.android.com/build/releases/gradle-plugin#api-level-support) to use `compileSdk` version 35 (Android 15)
+* [Android] bumped desugaring library to 2.1.4 and set Java compatibility to 11 instead of 8. Readme has been updated to reflect these changes  where`sourceCompatibility` and `targetCompability` should be set to JavaVersion.VERSION_11 (i.e. Java 11), and `jvmTarget` is set to `11`
+* [iOS] **Breaking change** removed `uiLocalNotificationDateInterpretation` parameter from `zonedSchedule()` method. This was done as it actually no relevant as of the 18.0.0 that dropped support for iOS versions older than 10, which in turn meant that the deprecated `UILocalNotification` APIs from Apple were no longer used. The corresponding `UILocalNotificationDateInterpretation` enum has already been removed as well
+* [iOS][macOS] **Breaking changes** the `DarwinNotificationActionOption` and `DarwinNotificationCategoryOption` are now enhanced enums with values accessible through the `value` property that are exactly the same as their native representations. Previously a bitwise left shift operation was applied to the index value
+* [iOS][macOS] **Breaking change** renamed `Converters` header and implementation to `FlutterLocalNotificationsConverters`. This would likely not affect any users of the plugin. Done to fix/mitigate issues [#2160](https://github.com/MaikuB/flutter_local_notifications/issues/2160) and [#2529](https://github.com/MaikuB/flutter_local_notifications/issues/2529) where the original name could clash
+* [iOS][macOS] added Swift Package Manager support
+* [Windows] Added support for Windows. Thanks to PR [Levi Lesches](https://github.com/Levi-Lesches) that continued the work done initially done by [Kenneth](https://github.com/kennethnym) and [lightrabbit](https://github.com/lightrabbit)
+*  **Breaking change** bumped minimum Flutter SDK requirement to 3.22.0 and Dart SDK requirement to 3.4.0. The minimum supported Android version is now 5.0 (API level 21)
+* Bumped `timezone` dependency so that minimum version is now 0.10.0
+* Bumped multiple dependencies in example app
+* Bumped minimum `plugin_platform_interface` version to 2.1.8
+* Updated example app's `AndroidManifest.xml` to request internet permissions so that release builds can download remote content
+* Migrated example app to use Plugin DSL. Thanks to the PR from [Martin Bertele](https://github.com/martin-bertele)
 * Updated `compileSdk` and `targetSdkVersion` of example app to 35
 
-## [19.0.0-dev.4]
-
-* [Windows] **Breaking change** Reworked the APIs around custom images and audio. Check the updated example for more details, but in short:
-  * Instead of `WindowsNotificationAudio.fromFile()`, use `WindowsNotificationAudio.asset()`
-  * Instead of `WindowsImage.file()`, use `WindowsImage()`. See the docs for what URIs are supported
-* [Windows] Added `MsixUtils.hasPackageIdentity()` and `MsixUtils.assetUri()`. You shouldn't need to use `.assetUri()` directly, but it may be helpful to check `.hasPackageIdentity()` to know what features your application can support.
-* [Windows] Added `FlutterLocalNotificationsWindows.isValidXml()` for testing raw XML.
-
-## [19.0.0-dev.3]
-
-* [iOS][macOS] **Breaking changes** the `DarwinNotificationActionOption` and `DarwinNotificationCategoryOption` are now enhanced enums with values accessible through the `value` property that are exactly the same as their native representations. Previously a bitwise left shift operation was applied to the index value
-* [iOS][macOS] added Swift Package Manager support
-
-## [19.0.0-dev.2]
-
-* [Windows] Fixed an issue that happens with MSIX app builds. Thanks to PR from [Levi Lesches](https://github.com/Levi-Lesches)
-* Removed duplicate important notice from the readme. Thanks to the PR from [Levi Lesches](https://github.com/Levi-Lesches)
-* Migrated example app to use Plugin DSL. Thanks to the PR from [Martin Bertele](https://github.com/martin-bertele)
-
-## [19.0.0-dev.1]
-
-* **Breaking change** bumped minimum Flutter SDK requirement to 3.19.0 and Dart SDK requirement to 3.3.0
-* **Breaking change** [iOS] removed `uiLocalNotificationDateInterpretation` parameter from `zonedSchedule()` method. This was done as it actually no relevant as of the 18.0.0 that dropped support for iOS versions older than 10, which in turn meant that the deprecated `UILocalNotification` APIs from Apple were no longer used. The corresponding `UILocalNotificationDateInterpretation` enum has already been removed as well
-* [Windows] Added support for Windows. Thanks to the PR from [Levi Lesches](https://github.com/Levi-Lesches/) that continued from the contributions from
-* Bumped `timezone` dependency so that minimum version is now 0.10.0
 
 ## [18.0.1]
 
