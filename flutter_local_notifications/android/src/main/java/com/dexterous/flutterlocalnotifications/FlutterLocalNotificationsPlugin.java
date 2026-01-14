@@ -762,13 +762,13 @@ public class FlutterLocalNotificationsPlugin
     if (notificationDetails.scheduleMode.useExactAlarm()) {
       checkCanScheduleExactAlarms(alarmManager);
       AlarmManagerCompat.setExactAndAllowWhileIdle(
-          alarmManager, AlarmManager.RTC_WAKEUP, epochMilli, pendingIntent);
+          alarmManager, AlarmManager.RTC, epochMilli, pendingIntent);
     } else if (notificationDetails.scheduleMode.useAlarmClock()) {
       checkCanScheduleExactAlarms(alarmManager);
       AlarmManagerCompat.setAlarmClock(alarmManager, epochMilli, pendingIntent, pendingIntent);
     } else {
       AlarmManagerCompat.setAndAllowWhileIdle(
-          alarmManager, AlarmManager.RTC_WAKEUP, epochMilli, pendingIntent);
+          alarmManager, AlarmManager.RTC, epochMilli, pendingIntent);
     }
   }
 
