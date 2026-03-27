@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.6.0'
+        classpath 'com.android.tools.build:gradle:8.11.1'
     }
 }
 
@@ -23,16 +23,16 @@ apply plugin: 'com.android.library'
 
 android {
     namespace 'com.dexterous.flutterlocalnotifications'
-    compileSdk 35
+    compileSdk 36
     compileOptions {
         coreLibraryDesugaringEnabled true
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     defaultConfig {
         multiDexEnabled true
-        minSdkVersion 21
+        minSdkVersion 24
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
