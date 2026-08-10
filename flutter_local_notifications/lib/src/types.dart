@@ -28,17 +28,11 @@ enum Day {
   final int value;
 }
 
-/// The components of a date and time representations.
-enum DateTimeComponents {
-  /// The time.
-  time,
+/// The isolate a notification dismissal is reported on.
+enum NotificationDismissedIsolate {
+  /// The application's main isolate.
+  main,
 
-  /// The day of the week and time.
-  dayOfWeekAndTime,
-
-  /// The day of the month and time.
-  dayOfMonthAndTime,
-
-  /// The date and time.
-  dateAndTime,
+  /// A background isolate.
+  background,
 }

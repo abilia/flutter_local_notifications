@@ -54,6 +54,7 @@ public class NotificationDetails implements Serializable {
   private static final String CHANNEL_DESCRIPTION = "channelDescription";
   private static final String CHANNEL_SHOW_BADGE = "channelShowBadge";
   private static final String IMPORTANCE = "importance";
+  private static final String CHANNEL_BYPASS_DND = "channelBypassDnd";
   private static final String STYLE_INFORMATION = "styleInformation";
   private static final String BIG_TEXT = "bigText";
   private static final String HTML_FORMAT_BIG_TEXT = "htmlFormatBigText";
@@ -75,6 +76,7 @@ public class NotificationDetails implements Serializable {
   private static final String BIG_PICTURE = "bigPicture";
   private static final String BIG_PICTURE_BITMAP_SOURCE = "bigPictureBitmapSource";
   private static final String HIDE_EXPANDED_LARGE_ICON = "hideExpandedLargeIcon";
+  private static final String SHOW_BIG_PICTURE_WHEN_COLLAPSED = "showBigPictureWhenCollapsed";
   private static final String SHOW_PROGRESS = "showProgress";
   private static final String MAX_PROGRESS = "maxProgress";
   private static final String PROGRESS = "progress";
@@ -121,6 +123,7 @@ public class NotificationDetails implements Serializable {
   private static final String MATCH_DATE_TIME_COMPONENTS = "matchDateTimeComponents";
 
   private static final String FULL_SCREEN_INTENT = "fullScreenIntent";
+  private static final String DISMISS_ISOLATE = "dismissIsolate";
   private static final String SHORTCUT_ID = "shortcutId";
   private static final String START_ACTIVITY_CLASS_NAME = "startActivityClassName";
   private static final String SHOW_NOTIFICATION = "showNotification";
@@ -139,6 +142,7 @@ public class NotificationDetails implements Serializable {
   public String channelDescription;
   public Boolean channelShowBadge;
   public Integer importance;
+  public Boolean channelBypassDnd;
   public Integer priority;
   public Boolean playSound;
   public String sound;
@@ -191,6 +195,7 @@ public class NotificationDetails implements Serializable {
   public DateTimeComponents matchDateTimeComponents;
   public Long when;
   public Boolean fullScreenIntent;
+  public Integer dismissIsolate;
   public String shortcutId;
   public String startActivityClassName;
   public Boolean showNotification;
@@ -292,6 +297,7 @@ public class NotificationDetails implements Serializable {
       notificationDetails.category = (String) platformChannelSpecifics.get(CATEGORY);
       notificationDetails.fullScreenIntent =
           (Boolean) platformChannelSpecifics.get((FULL_SCREEN_INTENT));
+      notificationDetails.dismissIsolate = (Integer) platformChannelSpecifics.get(DISMISS_ISOLATE);
       notificationDetails.shortcutId = (String) platformChannelSpecifics.get(SHORTCUT_ID);
       notificationDetails.additionalFlags = (int[]) platformChannelSpecifics.get(ADDITIONAL_FLAGS);
       notificationDetails.subText = (String) platformChannelSpecifics.get(SUB_TEXT);
@@ -399,6 +405,8 @@ public class NotificationDetails implements Serializable {
       notificationDetails.channelDescription =
           (String) platformChannelSpecifics.get(CHANNEL_DESCRIPTION);
       notificationDetails.importance = (Integer) platformChannelSpecifics.get(IMPORTANCE);
+      notificationDetails.channelBypassDnd =
+          (Boolean) platformChannelSpecifics.get(CHANNEL_BYPASS_DND);
       notificationDetails.channelShowBadge =
           (Boolean) platformChannelSpecifics.get(CHANNEL_SHOW_BADGE);
       notificationDetails.channelAction =
@@ -546,6 +554,8 @@ public class NotificationDetails implements Serializable {
         (Integer) styleInformation.get(BIG_PICTURE_BITMAP_SOURCE);
     BitmapSource bigPictureBitmapSource = BitmapSource.values()[bigPictureBitmapSourceArgument];
     Boolean showThumbnail = (Boolean) styleInformation.get(HIDE_EXPANDED_LARGE_ICON);
+    Boolean showBigPictureWhenCollapsed =
+        (Boolean) styleInformation.get(SHOW_BIG_PICTURE_WHEN_COLLAPSED);
     notificationDetails.styleInformation =
         new BigPictureStyleInformation(
             defaultStyleInformation.htmlFormatTitle,
@@ -558,7 +568,8 @@ public class NotificationDetails implements Serializable {
             largeIconBitmapSource,
             bigPicture,
             bigPictureBitmapSource,
-            showThumbnail);
+            showThumbnail,
+            showBigPictureWhenCollapsed);
   }
 
   private static DefaultStyleInformation getDefaultStyleInformation(

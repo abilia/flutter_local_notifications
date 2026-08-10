@@ -46,7 +46,7 @@ enum AndroidNotificationStyle {
   messaging,
 
   /// The media style.
-  media
+  media,
 }
 
 /// Specifies the source for a sound used by Android notifications.
@@ -65,7 +65,7 @@ enum AndroidNotificationChannelAction {
 
   /// Updates the details of an existing channel. Note that some details can
   /// not be changed once a channel has been created.
-  update
+  update,
 }
 
 /// The available foreground types for an Android service.
@@ -136,7 +136,7 @@ enum AndroidServiceStartType {
   startNotSticky,
 
   /// Corresponds to [`Service.START_REDELIVER_INTENT`](https://developer.android.com/reference/android/app/Service#START_REDELIVER_INTENT).
-  startRedeliverIntent
+  startRedeliverIntent,
 }
 
 /// The available importance levels for Android notifications.
@@ -205,7 +205,7 @@ enum GroupAlertBehavior {
   summary,
 
   /// The summary notification in a group should be silenced.
-  children
+  children,
 }
 
 /// Defines the notification visibility on the lockscreen.
@@ -266,6 +266,48 @@ enum AudioAttributesUsage {
   const AudioAttributesUsage(this.value);
 
   /// The integer representation of [AudioAttributesUsage].
+  final int value;
+}
+
+/// The available meanings that can be associated with a notification action.
+enum SemanticAction {
+  /// Corresponds to [`Notification.Action.SEMANTIC_ACTION_NONE`](https://developer.android.com/reference/android/app/Notification.Action#SEMANTIC_ACTION_NONE).
+  none(0),
+
+  /// Corresponds to [`Notification.Action.SEMANTIC_ACTION_REPLY`](https://developer.android.com/reference/android/app/Notification.Action#SEMANTIC_ACTION_REPLY).
+  reply(1),
+
+  /// Corresponds to [`Notification.Action.SEMANTIC_ACTION_MARK_AS_READ`](https://developer.android.com/reference/android/app/Notification.Action#SEMANTIC_ACTION_MARK_AS_READ).
+  markAsRead(2),
+
+  /// Corresponds to [`Notification.Action.SEMANTIC_ACTION_MARK_AS_UNREAD`](https://developer.android.com/reference/android/app/Notification.Action#SEMANTIC_ACTION_MARK_AS_UNREAD).
+  markAsUnread(3),
+
+  /// Corresponds to [`Notification.Action.SEMANTIC_ACTION_DELETE`](https://developer.android.com/reference/android/app/Notification.Action#SEMANTIC_ACTION_DELETE).
+  delete(4),
+
+  /// Corresponds to [`Notification.Action.SEMANTIC_ACTION_ARCHIVE`](https://developer.android.com/reference/android/app/Notification.Action#SEMANTIC_ACTION_ARCHIVE).
+  archive(5),
+
+  /// Corresponds to [`Notification.Action.SEMANTIC_ACTION_MUTE`](https://developer.android.com/reference/android/app/Notification.Action#SEMANTIC_ACTION_MUTE).
+  mute(6),
+
+  /// Corresponds to [`Notification.Action.SEMANTIC_ACTION_UNMUTE`](https://developer.android.com/reference/android/app/Notification.Action#SEMANTIC_ACTION_UNMUTE).
+  unmute(7),
+
+  /// Corresponds to [`Notification.Action.SEMANTIC_ACTION_THUMBS_UP`](https://developer.android.com/reference/android/app/Notification.Action#SEMANTIC_ACTION_THUMBS_UP).
+  thumbsUp(8),
+
+  /// Corresponds to [`Notification.Action.SEMANTIC_ACTION_THUMBS_DOWN`](https://developer.android.com/reference/android/app/Notification.Action#SEMANTIC_ACTION_THUMBS_DOWN).
+  thumbsDown(9),
+
+  /// Corresponds to [`Notification.Action.SEMANTIC_ACTION_CALL`](https://developer.android.com/reference/android/app/Notification.Action#SEMANTIC_ACTION_CALL).
+  call(10);
+
+  /// Constructs an instance of [SemanticAction].
+  const SemanticAction(this.value);
+
+  /// The integer representation of [SemanticAction].
   final int value;
 }
 
