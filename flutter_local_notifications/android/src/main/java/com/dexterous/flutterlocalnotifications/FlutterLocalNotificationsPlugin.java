@@ -978,6 +978,8 @@ public class FlutterLocalNotificationsPlugin
       if (notificationDetails.vibrationPattern != null
           && notificationDetails.vibrationPattern.length > 0) {
         builder.setVibrate(notificationDetails.vibrationPattern);
+      } else if (VERSION.SDK_INT < VERSION_CODES.O) {
+        builder.setDefaults(Notification.DEFAULT_VIBRATE);
       }
     } else {
       builder.setVibrate(new long[] {0});

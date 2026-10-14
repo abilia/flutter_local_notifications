@@ -233,6 +233,7 @@ class AndroidNotificationDetails {
   /// Configures the vibration pattern.
   ///
   /// Requires setting [enableVibration] to true for it to work.
+  /// If null or empty, the system default vibration pattern is used.
   /// For Android 8.0 or newer, this is tied to the specified channel and cannot
   /// be changed after the channel has been created for the first time.
   final Int64List? vibrationPattern;
