@@ -380,3 +380,11 @@ jobs:
       - name: Grant notification permissions
         run: applesimutils --byId ${{ steps.simulator-action.outputs.udid}} --bundle com.dexterous.flutterLocalNotificationsExample --setPermissions notifications=YES
       - run: melos run test:integration
+      - name: Run native iOS attachment regression tests
+        working-directory: flutter_local_notifications/example
+        run: |
+          xcodebuild test -workspace ios/Runner.xcworkspace -scheme Runner \
+            -destination 'platform=iOS Simulator,id=${{ steps.simulator-action.outputs.udid }}' \
+            -only-testing:RunnerTests -parallel-testing-enabled NO \
+            FLUTTER_TARGET=integration_test/ios_attachment_error_test.dart \
+            CODE_SIGNING_ALLOWED=NO

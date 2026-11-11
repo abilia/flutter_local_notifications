@@ -649,6 +649,10 @@ static FlutterError *getFlutterError(NSError *error) {
       result:(FlutterResult _Nonnull)result API_AVAILABLE(ios(10.0)) {
   UNMutableNotificationContent *content =
       [self buildStandardNotificationContent:arguments result:result];
+  if (content == nil) {
+    // The attachment error has already been sent to Flutter.
+    return;
+  }
   [self addNotificationRequest:[self getIdentifier:arguments]
                        content:content
                         result:result
@@ -659,6 +663,10 @@ static FlutterError *getFlutterError(NSError *error) {
                result:(FlutterResult _Nonnull)result API_AVAILABLE(ios(10.0)) {
   UNMutableNotificationContent *content =
       [self buildStandardNotificationContent:arguments result:result];
+  if (content == nil) {
+    // The attachment error has already been sent to Flutter.
+    return;
+  }
   UNCalendarNotificationTrigger *trigger =
       [self buildUserNotificationCalendarTrigger:arguments];
   [self addNotificationRequest:[self getIdentifier:arguments]
@@ -672,6 +680,10 @@ static FlutterError *getFlutterError(NSError *error) {
     API_AVAILABLE(ios(10.0)) {
   UNMutableNotificationContent *content =
       [self buildStandardNotificationContent:arguments result:result];
+  if (content == nil) {
+    // The attachment error has already been sent to Flutter.
+    return;
+  }
   UNTimeIntervalNotificationTrigger *trigger =
       [self buildUserNotificationTimeIntervalTrigger:arguments];
   [self addNotificationRequest:[self getIdentifier:arguments]
