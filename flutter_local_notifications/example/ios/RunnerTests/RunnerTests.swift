@@ -46,7 +46,7 @@ class RunnerTests: XCTestCase {
       "repeatIntervalMilliseconds": 3600000,
       "platformSpecifics": [
         "attachments": [["identifier": "image", "filePath": invalidAttachment]]
-      ],
+      ]
     ]
     var results: [Any?] = []
 
