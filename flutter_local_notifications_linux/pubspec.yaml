@@ -13,7 +13,7 @@ flutter:
 
 
 dependencies:
-  dbus: ^0.7.8
+  dbus: ">=0.7.8 <0.9.0"
   ffi: ^2.0.1
   flutter:
     sdk: flutter
