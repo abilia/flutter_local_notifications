@@ -364,7 +364,13 @@ class AndroidNotificationDetails {
   /// page for your application.
   final bool fullScreenIntent;
 
-  /// The class name to start intent on lockscreen.
+  /// The activity to start on the lock screen.
+  ///
+  /// To use this activity whenever Android launches a full-screen notification,
+  /// set the boolean activity metadata
+  /// `com.dexterous.flutterlocalnotifications.DEDICATED_FULL_SCREEN_ACTIVITY`
+  /// to true in the manifest. This also supports display-off devices with the
+  /// lock screen set to None. The notification tap keeps its normal target.
   final String? startActivityClassName;
 
   /// If any notification should be shown if false only sound will play

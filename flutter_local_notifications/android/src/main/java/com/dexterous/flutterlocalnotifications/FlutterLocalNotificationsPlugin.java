@@ -13,6 +13,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationChannelGroup;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -271,16 +272,9 @@ public class FlutterLocalNotificationsPlugin
     if (canCreateNotificationChannel(context, notificationChannelDetails)) {
       setupNotificationChannel(context, notificationChannelDetails);
     }
-    Intent intent = getLaunchIntent(context, notificationDetails);
-    intent.setAction(SELECT_NOTIFICATION);
-    intent.putExtra(NOTIFICATION_ID, notificationDetails.id);
-    intent.putExtra(PAYLOAD, notificationDetails.payload);
-    int flags = PendingIntent.FLAG_UPDATE_CURRENT;
-    if (VERSION.SDK_INT >= VERSION_CODES.M) {
-      flags |= PendingIntent.FLAG_IMMUTABLE;
-    }
     PendingIntent pendingIntent =
-        PendingIntent.getActivity(context, notificationDetails.id, intent, flags);
+        notificationPendingIntent(
+            context, notificationDetails, getLaunchIntent(context, notificationDetails));
     DefaultStyleInformation defaultStyleInformation =
         (DefaultStyleInformation) notificationDetails.styleInformation;
     NotificationCompat.Builder builder =
@@ -439,7 +433,14 @@ public class FlutterLocalNotificationsPlugin
     }
 
     if (BooleanUtils.getValue(notificationDetails.fullScreenIntent)) {
-      builder.setFullScreenIntent(pendingIntent, true);
+      PendingIntent fullScreenIntent =
+          usesDedicatedFullScreenActivity(context, notificationDetails)
+              ? notificationPendingIntent(
+                  context,
+                  notificationDetails,
+                  new Intent().setClassName(context, notificationDetails.startActivityClassName))
+              : pendingIntent;
+      builder.setFullScreenIntent(fullScreenIntent, true);
     }
 
     if (!StringUtils.isNullOrEmpty(notificationDetails.shortcutId)) {
@@ -1022,6 +1023,39 @@ public class FlutterLocalNotificationsPlugin
       return;
     }
     builder.setTimeoutAfter(notificationDetails.timeoutAfter);
+  }
+
+  private static PendingIntent notificationPendingIntent(
+      Context context, NotificationDetails notificationDetails, Intent intent) {
+    intent.setAction(SELECT_NOTIFICATION);
+    intent.putExtra(NOTIFICATION_ID, notificationDetails.id);
+    intent.putExtra(PAYLOAD, notificationDetails.payload);
+    int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+    if (VERSION.SDK_INT >= VERSION_CODES.M) {
+      flags |= PendingIntent.FLAG_IMMUTABLE;
+    }
+    return PendingIntent.getActivity(context, notificationDetails.id, intent, flags);
+  }
+
+  // Reading the opt-in from the target activity also covers alarms scheduled before an app update.
+  static boolean usesDedicatedFullScreenActivity(Context context, NotificationDetails details) {
+    if (!BooleanUtils.getValue(details.fullScreenIntent)
+        || details.startActivityClassName == null) {
+      return false;
+    }
+    try {
+      ComponentName activity = new ComponentName(context, details.startActivityClassName);
+      Bundle metadata =
+          context
+              .getPackageManager()
+              .getActivityInfo(activity, PackageManager.GET_META_DATA)
+              .metaData;
+      return metadata != null
+          && metadata.getBoolean(
+              "com.dexterous.flutterlocalnotifications.DEDICATED_FULL_SCREEN_ACTIVITY");
+    } catch (PackageManager.NameNotFoundException e) {
+      return false;
+    }
   }
 
   private static Intent getLaunchIntent(Context context, NotificationDetails notificationDetails) {

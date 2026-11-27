@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.PowerManager;
 import android.util.Log;
 
 import androidx.annotation.Keep;
@@ -59,6 +60,9 @@ public class ScheduledNotificationReceiver extends BroadcastReceiver {
       Type type = new TypeToken<NotificationDetails>() {}.getType();
       NotificationDetails notificationDetails = gson.fromJson(notificationDetailsJson, type);
       final boolean locked = FlutterLocalNotificationsPlugin.isKeyguardLocked(context);
+      // Decide before notify(): SystemUI may wake the device while delivering the full-screen
+      // intent.
+      boolean startDirectly = shouldStartDirectly(context, notificationDetails, locked);
       if (notificationDetails.showNotification == null
           || notificationDetails.showNotification
           || locked) {
@@ -66,12 +70,23 @@ public class ScheduledNotificationReceiver extends BroadcastReceiver {
       }
       FlutterLocalNotificationsPlugin.scheduleNextNotification(context, notificationDetails);
 
-      boolean firstAlarm =
-          LocalDateTime.parse(notificationDetails.scheduledDateTime).getSecond() == 0;
-      boolean hasStartActivity = notificationDetails.startActivityClassName != null;
-      if (hasStartActivity && (!locked || !firstAlarm)) {
+      if (startDirectly) {
         FlutterLocalNotificationsPlugin.startAlarmActivity(context, notificationDetails);
       }
     }
+  }
+
+  private static boolean shouldStartDirectly(
+      Context context, NotificationDetails details, boolean locked) {
+    if (details.startActivityClassName == null) return false;
+    if (locked) {
+      return LocalDateTime.parse(details.scheduledDateTime).getSecond() != 0;
+    }
+    if (Boolean.FALSE.equals(details.showNotification)
+        || !FlutterLocalNotificationsPlugin.usesDedicatedFullScreenActivity(context, details)) {
+      return true;
+    }
+    PowerManager power = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+    return power.isInteractive();
   }
 }
